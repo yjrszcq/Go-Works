@@ -36,7 +36,7 @@ func NewCustomerDAO(db *gorm.DB) *CustomerDAO {
 	}
 }
 
-func (dao *CustomerDAO) Insert(ctx context.Context, c Customer) error {
+func (dao *CustomerDAO) InsertCustomer(ctx context.Context, c Customer) error {
 	//now := time.Now().UnixMilli() //返回 int64 毫秒数
 	now := time.Now()
 	c.CreatedAt = now
@@ -53,21 +53,45 @@ func (dao *CustomerDAO) Insert(ctx context.Context, c Customer) error {
 	return err
 }
 
-func (dao *CustomerDAO) FindByEmail(ctx context.Context, email string) (Customer, error) {
+func (dao *CustomerDAO) FindCustomerByEmail(ctx context.Context, email string) (Customer, error) {
 	var c Customer
 	err := dao.db.WithContext(ctx).Where("email = ?", email).First(&c).Error // 只找第一条记录
 	return c, err
 }
 
-func (dao *CustomerDAO) FindById(ctx context.Context, id int64) (Customer, error) {
+func (dao *CustomerDAO) FindCustomerById(ctx context.Context, id int64) (Customer, error) {
 	var c Customer
 	err := dao.db.WithContext(ctx).Where("customer_id = ?", id).First(&c).Error // 只找第一条记录
 	return c, err
 }
 
-func (dao *CustomerDAO) Update(ctx context.Context, c Customer) error {
+func (dao *CustomerDAO) UpdateCustomer(ctx context.Context, c Customer) error {
 	now := time.Now()
 	c.UpdatedAt = now
-	err := dao.db.WithContext(ctx).Save(&c).Error
+	err := dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
+		Name:      c.Name,
+		Email:     c.Email,
+		Phone:     c.Phone,
+		Address:   c.Address,
+		UpdatedAt: c.UpdatedAt,
+	}).Error
+	if err != nil {
+		return err
+	}
+	if c.Password != "" {
+		err = dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
+			Password: c.Password,
+		}).Error
+	}
 	return err
+}
+
+func (dao *CustomerDAO) FindAllCustomers(ctx context.Context) ([]Customer, error) {
+	var customers []Customer
+	err := dao.db.WithContext(ctx).Find(&customers).Error
+	return customers, err
+}
+
+func (dao *CustomerDAO) DeleteCustomer(ctx context.Context, id int64) error {
+	return dao.db.WithContext(ctx).Delete(&Customer{}, id).Error
 }

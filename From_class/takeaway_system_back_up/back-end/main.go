@@ -18,9 +18,7 @@ import (
 func main() {
 	db := initDB()
 	server := initWebServer()
-
 	init_web.RegisterRoutes(db, server)
-
 	server.Run(":1000")
 }
 
@@ -61,13 +59,18 @@ func initWebServer() *gin.Engine {
 				// 开发环境
 				return true
 			}
-			return strings.Contains(origin, "szcq.cyou")
+			return strings.Contains(origin, "szcq.top")
 		},
 		MaxAge: 12 * time.Second,
 	}))
 	// 登录校验
 	store := cookie.NewStore([]byte("secret"))  // 存 sessions 数据的地方
 	server.Use(sessions.Sessions("sid", store)) // cookie 的名字和值(store)
-	server.Use(middleware.NewLoginMiddlewareBuilder().IgnorePaths("/customer/login", "/customer/signup").Build())
+	server.Use(middleware.NewLoginMiddlewareBuilder().
+		IgnorePaths("/customer/login").
+		IgnorePaths("/customer/signup").
+		IgnorePaths("/employee/login").
+		IgnorePaths("/employee/signup").
+		Build())
 	return server
 }

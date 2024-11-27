@@ -27,25 +27,24 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 				return
 			}
 		}
-		/*
-			或直接这样
-			if ctx.Request.URL.Path == "/users/login" ||
-					ctx.Request.URL.Path == "/users/signup" {
-					return
-				}
-		*/
 		sess := sessions.Default(ctx)
-		/*
-			if sess == nil {
-				// 没有登录
-				ctx.AbortWithStatus(http.StatusUnauthorized)
+		role := sess.Get("role") // 获取用户角色
+		// 根据角色检查对应的ID
+		switch role {
+		case "customer":
+			id := sess.Get("customerId")
+			if id == nil {
+				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "customer not logged in"})
 				return
 			}
-			// 不可能为 nil，因为上面已经有 session 插件了
-		*/
-		id := sess.Get("userId")
-		if id == nil {
-			// 没有登录
+		case "employee":
+			id := sess.Get("employeeId")
+			if id == nil {
+				ctx.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "employee not logged in"})
+				return
+			}
+		default:
+			// 如果没有角色或角色不是预期的值，则认为没有登录
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
