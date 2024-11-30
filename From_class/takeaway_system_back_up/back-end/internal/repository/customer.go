@@ -58,15 +58,24 @@ func (r *CustomerRepository) FindCustomerByEmail(ctx context.Context, email stri
 	}, nil
 }
 
-func (r *CustomerRepository) UpdateCustomer(ctx context.Context, c domain.Customer) error {
-	return r.dao.UpdateCustomer(ctx, dao.Customer{
-		CustomerID: c.Id,
-		Name:       c.Name,
-		Email:      c.Email,
-		Password:   c.Password,
-		Phone:      c.Phone,
-		Address:    c.Address,
-	})
+func (r *CustomerRepository) FindCustomerByName(ctx context.Context, name string) ([]domain.Customer, error) {
+	customers, err := r.dao.FindCustomerByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	var result []domain.Customer
+	for _, c := range customers {
+		result = append(result, domain.Customer{
+			Id:        c.CustomerID,
+			Name:      c.Name,
+			Email:     c.Email,
+			Phone:     c.Phone,
+			Address:   c.Address,
+			CreatedAt: c.CreatedAt,
+			UpdatedAt: c.UpdatedAt,
+		})
+	}
+	return result, nil
 }
 
 func (r *CustomerRepository) FindAllCustomers(ctx context.Context) ([]domain.Customer, error) {
@@ -87,6 +96,34 @@ func (r *CustomerRepository) FindAllCustomers(ctx context.Context) ([]domain.Cus
 		})
 	}
 	return result, nil
+}
+
+func (r *CustomerRepository) UpdateCustomer(ctx context.Context, c domain.Customer) error {
+	return r.dao.UpdateCustomer(ctx, dao.Customer{
+		CustomerID: c.Id,
+		Name:       c.Name,
+		Email:      c.Email,
+		Phone:      c.Phone,
+		Address:    c.Address,
+	})
+}
+
+func (r *CustomerRepository) UpdateCustomerPassword(ctx context.Context, c domain.Customer) error {
+	return r.dao.UpdateCustomerPassword(ctx, dao.Customer{
+		CustomerID: c.Id,
+		Password:   c.Password,
+	})
+}
+
+func (r *CustomerRepository) UpdateCustomerAll(ctx context.Context, c domain.Customer) error {
+	return r.dao.UpdateCustomerAll(ctx, dao.Customer{
+		CustomerID: c.Id,
+		Name:       c.Name,
+		Email:      c.Email,
+		Password:   c.Password,
+		Phone:      c.Phone,
+		Address:    c.Address,
+	})
 }
 
 func (r *CustomerRepository) DeleteCustomer(ctx context.Context, id int64) error {

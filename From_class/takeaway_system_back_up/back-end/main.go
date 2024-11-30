@@ -71,6 +71,9 @@ func initWebServer() *gin.Engine {
 		IgnorePaths("/customer/signup").
 		IgnorePaths("/employee/login").
 		IgnorePaths("/employee/signup").
+		IgnorePaths("/dish/*").
+		IgnorePaths("/category/*").
+		IgnorePaths("/review/find/*").
 		Build())
 	return server
 }

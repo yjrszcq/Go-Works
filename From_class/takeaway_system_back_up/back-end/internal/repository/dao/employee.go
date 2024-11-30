@@ -59,6 +59,12 @@ func (dao *EmployeeDAO) FindEmployeeById(ctx context.Context, id int64) (Employe
 	return e, err
 }
 
+func (dao *EmployeeDAO) FindEmployeeByName(ctx context.Context, name string) ([]Employee, error) {
+	var employees []Employee
+	err := dao.db.WithContext(ctx).Where("name LIKE ?", "%"+name+"%").Find(&employees).Error
+	return employees, err
+}
+
 func (dao *EmployeeDAO) FindAllEmployees(ctx context.Context) ([]Employee, error) {
 	var employees []Employee
 	err := dao.db.WithContext(ctx).Find(&employees).Error
@@ -66,24 +72,49 @@ func (dao *EmployeeDAO) FindAllEmployees(ctx context.Context) ([]Employee, error
 }
 
 func (dao *EmployeeDAO) UpdateEmployee(ctx context.Context, e Employee) error {
-	now := time.Now()
-	e.UpdatedAt = now
+	err := dao.db.WithContext(ctx).Model(&Employee{}).Where("employee_id = ?", e.EmployeeID).Updates(Employee{
+		Name:      e.Name,
+		Email:     e.Email,
+		Phone:     e.Phone,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
+}
+
+func (dao *EmployeeDAO) UpdateEmployeePassword(ctx context.Context, e Employee) error {
+	err := dao.db.WithContext(ctx).Model(&Employee{}).Where("employee_id = ?", e.EmployeeID).Updates(Employee{
+		Password:  e.Password,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
+}
+
+func (dao *EmployeeDAO) UpdateEmployeeRole(ctx context.Context, e Employee) error {
+	err := dao.db.WithContext(ctx).Model(&Employee{}).Where("employee_id = ?", e.EmployeeID).Updates(Employee{
+		Role:      e.Role,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
+}
+
+func (dao *EmployeeDAO) UpdateEmployeeStatus(ctx context.Context, e Employee) error {
+	err := dao.db.WithContext(ctx).Model(&Employee{}).Where("employee_id = ?", e.EmployeeID).Updates(Employee{
+		Status:    e.Status,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
+}
+
+func (dao *EmployeeDAO) UpdateEmployeeAll(ctx context.Context, e Employee) error {
 	err := dao.db.WithContext(ctx).Model(&Employee{}).Where("employee_id = ?", e.EmployeeID).Updates(Employee{
 		Name:      e.Name,
 		Role:      e.Role,
 		Email:     e.Email,
+		Password:  e.Password,
 		Phone:     e.Phone,
 		Status:    e.Status,
-		UpdatedAt: e.UpdatedAt,
+		UpdatedAt: time.Now(),
 	}).Error
-	if err != nil {
-		return err
-	}
-	if e.Password != "" {
-		err = dao.db.WithContext(ctx).Model(&Employee{}).Where("employee_id = ?", e.EmployeeID).Updates(Employee{
-			Password: e.Password,
-		}).Error
-	}
 	return err
 }
 

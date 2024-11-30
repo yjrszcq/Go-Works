@@ -1,44 +1,48 @@
 package web
 
 import (
-	"back-end/internal/domain"
 	"back-end/internal/service"
 	"errors"
-	regexp "github.com/dlclark/regexp2"
-	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
 
 type EmployeeHandler struct {
-	svc         *service.EmployeeService
-	nameExp     *regexp.Regexp
-	emailExp    *regexp.Regexp
-	passwordExp *regexp.Regexp
-	phoneExp    *regexp.Regexp
+	svc *service.EmployeeService
 }
 
 func NewEmployeeHandler(svc *service.EmployeeService) *EmployeeHandler {
-	nameExp := regexp.MustCompile(nameRegexPattern, regexp.None)
-	emailExp := regexp.MustCompile(emailRegexPattern, regexp.None)
-	passwordExp := regexp.MustCompile(passwordRegexPattern, regexp.None)
-	phoneExp := regexp.MustCompile(phoneRegexPattern, regexp.None)
 	return &EmployeeHandler{
-		svc:         svc,
-		nameExp:     nameExp,
-		emailExp:    emailExp,
-		passwordExp: passwordExp,
-		phoneExp:    phoneExp,
+		svc: svc,
 	}
 }
 
-func getCurrentEmployeeId(ctx *gin.Context) int64 {
-	sess := sessions.Default(ctx)
-	if sess.Get("role").(string) != "employee" {
-		return -1
+func (e *EmployeeHandler) ErrOutputForEmployee(ctx *gin.Context, err error) {
+	if errors.Is(err, service.ErrUserDuplicateEmailInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱冲突"})
+	} else if errors.Is(err, service.ErrInvalidUserOrPasswordInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱或密码错误"})
+	} else if errors.Is(err, service.ErrFormatForNameInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 姓名格式错误"})
+	} else if errors.Is(err, service.ErrFormatForEmailInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱格式错误"})
+	} else if errors.Is(err, service.ErrFormatForPasswordInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 密码包含至少一位数字，字母和特殊字符,且长度8-16"})
+	} else if errors.Is(err, service.ErrFormatForPhoneInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 请输入11位的中国大陆地区的手机号"})
+	} else if errors.Is(err, service.ErrUserListIsEmptyInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 用户列表为空"})
+	} else if errors.Is(err, service.ErrUserNotFoundInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 用户不存在"})
+	} else if errors.Is(err, service.ErrRoleInputInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 角色不存在"})
+	} else if errors.Is(err, service.ErrStatusInputInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 状态不存在"})
+	} else if errors.Is(err, service.ErrPasswordIsWrongInEmployee) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 密码错误"})
+	} else {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
 	}
-	employeeId := sess.Get("employeeId").(int64)
-	return employeeId
 }
 
 func (e *EmployeeHandler) SignUpEmployee(ctx *gin.Context) {
@@ -51,72 +55,16 @@ func (e *EmployeeHandler) SignUpEmployee(ctx *gin.Context) {
 		ConfirmPassword string `json:"confirm_password"`
 	}
 	var req SignUpReq
-	if err := ctx.BindJSON(&req); err != nil {
+	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-
-	if req.ConfirmPassword != req.Password {
-		ctx.String(http.StatusOK, "两次输入的密码不一致")
-		return
-	}
-
-	ok, err := e.emailExp.MatchString(req.Email)
+	err := e.svc.SignUpEmployee(ctx, req.Name, req.Phone, req.Email, req.Role, req.Password, req.ConfirmPassword)
 	if err != nil {
-		ctx.String(http.StatusOK, "注册失败, 系统错误")
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
-	if !ok {
-		ctx.String(http.StatusOK, "邮箱格式错误")
-		return
-	}
-
-	ok, err = e.passwordExp.MatchString(req.Password)
-	if err != nil {
-		ctx.String(http.StatusOK, "注册失败, 系统错误")
-		return
-	}
-	if !ok {
-		ctx.String(http.StatusOK, "密码包含至少一位数字，字母和特殊字符,且长度8-16")
-		return
-	}
-
-	ok, err = e.nameExp.MatchString(req.Name)
-	if err != nil {
-		ctx.String(http.StatusOK, "注册失败, 系统错误")
-		return
-	}
-	if !ok {
-		ctx.String(http.StatusOK, "姓名不合法")
-		return
-	}
-
-	ok, err = e.phoneExp.MatchString(req.Phone)
-	if err != nil {
-		ctx.String(http.StatusOK, "注册失败, 系统错误")
-		return
-	}
-	if !ok {
-		ctx.String(http.StatusOK, "请输入11位的中国大陆地区的手机号")
-		return
-	}
-
-	err = e.svc.SignUpEmployee(ctx.Request.Context(), domain.Employee{
-		Email:    req.Email,
-		Password: req.Password,
-		Name:     req.Name,
-		Phone:    req.Phone,
-		Role:     req.Role,
-	})
-	if err != nil {
-		if errors.Is(err, service.ErrUserDuplicateEmail) {
-			ctx.String(http.StatusOK, "邮箱冲突")
-		} else {
-			ctx.String(http.StatusOK, "系统错误")
-		}
-		return
-	}
-	ctx.String(http.StatusOK, "注册成功") // 响应
+	ctx.JSON(http.StatusOK, gin.H{"message": "注册成功"}) // 响应
 }
 
 func (e *EmployeeHandler) LogInEmployee(ctx *gin.Context) {
@@ -124,241 +72,190 @@ func (e *EmployeeHandler) LogInEmployee(ctx *gin.Context) {
 		Email    string `json:"email"`
 		Password string `json:"password"`
 	}
-
 	var req LogInReq
-	if err := ctx.Bind(&req); err != nil {
-		ctx.String(http.StatusOK, "登录失败, 系统错误")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "登录失败, 系统错误"})
 		return
 	}
-	employee, err := e.svc.LogInEmployee(ctx, domain.Employee{
-		Email:    req.Email,
-		Password: req.Password,
-	})
-
+	err := e.svc.LogInEmployee(ctx, req.Email, req.Password)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidUserOrPassword) {
-			ctx.String(http.StatusOK, "用户名或密码错误")
-			return
-		} else {
-			ctx.String(http.StatusOK, "系统错误")
-			return
-		}
-	}
-	// 在这里登录成功
-	// 设置 session
-	sess := sessions.Default(ctx)
-	// 可以随便设置值了
-	// 要放在 session 里面的值
-	sess.Set("role", "employee")
-	sess.Set("employeeId", employee.Id)
-	switch employee.Role {
-	case "管理员":
-		sess.Set("employeeRole", "admin")
-	case "员工":
-		sess.Set("employeeRole", "employee")
-	case "送餐员":
-		sess.Set("employeeRole", "deliveryman")
-	}
-	switch employee.Status {
-	case "可用":
-		sess.Set("employeeStatus", "available")
-	case "不可用":
-		sess.Set("employeeStatus", "unavailable")
-	}
-	err = sess.Save()
-	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
-	ctx.String(http.StatusOK, "登录成功")
-	return
+	ctx.JSON(http.StatusOK, gin.H{"message": "登录成功"})
 }
 
 func (e *EmployeeHandler) EditEmployee(ctx *gin.Context) {
 	type EditReq struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
-		Phone    string `json:"phone"`
-		Role     string `json:"role"`
-		Status   string `json:"status"`
+		Name  string `json:"name"`
+		Email string `json:"email"`
+		Phone string `json:"phone"`
 	}
-
-	id := getCurrentEmployeeId(ctx)
-	if id == -1 {
-		ctx.String(http.StatusOK, "无权限")
-		return
-	}
-
 	var req EditReq
-	if err := ctx.Bind(&req); err != nil {
-		ctx.String(http.StatusOK, "修改失败, 系统错误")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, 系统错误"})
 		return
 	}
-
-	ok, err := e.nameExp.MatchString(req.Name)
+	err := e.svc.EditEmployee(ctx, req.Name, req.Phone, req.Email)
 	if err != nil {
-		ctx.String(http.StatusOK, "修改失败, 系统错误")
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
-	if !ok {
-		ctx.String(http.StatusOK, "姓名格式错误")
-	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
+}
 
-	ok, err = e.emailExp.MatchString(req.Email)
+func (e *EmployeeHandler) ChangeEmployeePassword(ctx *gin.Context) {
+	type ChangeReq struct {
+		OldPassword     string `json:"old_password"`
+		NewPassword     string `json:"new_password"`
+		ConfirmPassword string `json:"confirm_password"`
+	}
+	var req ChangeReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, 系统错误"})
+		return
+	}
+	err := e.svc.ChangeEmployeePassword(ctx, req.OldPassword, req.NewPassword, req.ConfirmPassword)
 	if err != nil {
-		ctx.String(http.StatusOK, "修改失败, 系统错误")
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
-	if !ok {
-		ctx.String(http.StatusOK, "邮箱格式错误")
-		return
-	}
-
-	ok, err = e.passwordExp.MatchString(req.Password)
-	if err != nil {
-		ctx.String(http.StatusOK, "修改失败, 系统错误")
-		return
-	}
-	if !ok {
-		ctx.String(http.StatusOK, "密码包含至少一位数字，字母和特殊字符,且长度8-16")
-		return
-	}
-
-	ok, err = e.phoneExp.MatchString(req.Phone)
-	if err != nil {
-		ctx.String(http.StatusOK, "修改失败, 系统错误")
-		return
-	}
-	if !ok {
-		ctx.String(http.StatusOK, "请输入11位的中国大陆地区的手机号")
-		return
-	}
-
-	if req.Role != "管理员" && req.Role != "员工" && req.Role != "送餐员" {
-		ctx.String(http.StatusOK, "修改失败, 角色错误")
-		return
-	}
-
-	if req.Status != "可用" && req.Status != "不可用" {
-		ctx.String(http.StatusOK, "修改失败, 状态错误")
-		return
-	}
-
-	err = e.svc.EditEmployee(ctx.Request.Context(), domain.Employee{
-		Id:       id,
-		Name:     req.Name,
-		Email:    req.Email,
-		Password: req.Password,
-		Phone:    req.Phone,
-		Role:     req.Role,
-		Status:   req.Status,
-	})
-
-	if err != nil {
-		if errors.Is(err, service.ErrUserDuplicateEmail) {
-			ctx.String(http.StatusOK, "邮箱冲突")
-		} else if errors.Is(err, service.ErrInvalidUserOrPassword) {
-			ctx.String(http.StatusOK, "用户不存在")
-		} else {
-			ctx.String(http.StatusOK, "系统错误")
-		}
-		return
-	}
-	ctx.String(http.StatusOK, "修改成功") // 响应
+	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
 }
 
 func (e *EmployeeHandler) ProfileEmployee(ctx *gin.Context) {
-	id := getCurrentEmployeeId(ctx)
-	if id == -1 {
-		ctx.String(http.StatusOK, "无权限")
-		return
-	}
-	employee, err := e.svc.GetProfileEmployee(ctx, domain.Employee{
-		Id: id,
-	})
+	employee, err := e.svc.ProfileEmployee(ctx)
 	if err != nil {
-		ctx.String(http.StatusOK, "系统错误")
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, employee)
 }
 
 func (e *EmployeeHandler) LogOutEmployee(ctx *gin.Context) {
-	sess := sessions.Default(ctx)
-	sess.Delete("role")
-	sess.Delete("employeeId")
-	sess.Delete("employeeRole")
-	sess.Delete("employeeStatus")
-	err := sess.Save()
+	err := e.svc.LogOutEmployee(ctx)
 	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
-	ctx.String(http.StatusOK, "退出成功")
+	ctx.JSON(http.StatusOK, gin.H{"message": "退出成功"})
+}
+
+func (e *EmployeeHandler) EditEmployeeByAdmin(ctx *gin.Context) {
+	type EditReq struct {
+		Id       int64  `json:"id"`
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Phone    string `json:"phone"`
+		Password string `json:"password"`
+		Role     string `json:"role"`
+		Status   string `json:"status"`
+	}
+	var req EditReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, 系统错误"})
+		return
+	}
+	err := e.svc.EditEmployeeByAdmin(ctx, req.Id, req.Name, req.Email, req.Password, req.Phone, req.Role, req.Status)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
+}
+
+func (e *EmployeeHandler) EditEmployeeRole(ctx *gin.Context) {
+	type EditReq struct {
+		Id   int64  `json:"id"`
+		Role string `json:"role"`
+	}
+	var req EditReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, 系统错误"})
+		return
+	}
+	err := e.svc.EditEmployeeRole(ctx, req.Id, req.Role)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
+}
+
+func (e *EmployeeHandler) EditEmployeeStatus(ctx *gin.Context) {
+	type EditReq struct {
+		Id     int64  `json:"id"`
+		Status string `json:"status"`
+	}
+	var req EditReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, 系统错误"})
+		return
+	}
+	err := e.svc.EditEmployeeStatus(ctx, req.Id, req.Status)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
 }
 
 func (e *EmployeeHandler) GetAllEmployees(ctx *gin.Context) {
-	sess := sessions.Default(ctx)
-	role := sess.Get("employeeRole").(string)
-	if role != "admin" {
-		ctx.String(http.StatusOK, "无权限")
-		return
-	}
 	employees, err := e.svc.GetAllEmployees(ctx)
 	if err != nil {
-		ctx.String(http.StatusOK, "系统错误")
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, employees)
 }
 
 func (e *EmployeeHandler) GetEmployeeById(ctx *gin.Context) {
-	sess := sessions.Default(ctx)
-	if sess.Get("role") != "admin" {
-		ctx.String(http.StatusOK, "无权限")
-		return
-	}
 	type GetReq struct {
 		Id int64 `json:"id"`
 	}
-
 	var req GetReq
-	if err := ctx.Bind(&req); err != nil {
-		ctx.String(http.StatusOK, "查询失败, 系统错误")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, 系统错误"})
 		return
 	}
-
-	employee, err := e.svc.GetProfileEmployee(ctx, domain.Employee{
-		Id: req.Id,
-	})
+	employee, err := e.svc.GetEmployeeById(ctx, req.Id)
 	if err != nil {
-		ctx.String(http.StatusOK, "系统错误")
+		e.ErrOutputForEmployee(ctx, err)
 		return
 	}
 	ctx.JSON(http.StatusOK, employee)
 }
 
-func (e *EmployeeHandler) DeleteEmployee(ctx *gin.Context) {
-	sess := sessions.Default(ctx)
-	if sess.Get("role") != "admin" {
-		ctx.String(http.StatusOK, "无权限")
+func (e *EmployeeHandler) GetEmployeeByName(ctx *gin.Context) {
+	type GetReq struct {
+		Name string `json:"name"`
+	}
+	var req GetReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, 系统错误"})
 		return
 	}
+	employees, err := e.svc.GetEmployeeByName(ctx, req.Name)
+	if err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "系统错误"})
+		return
+	}
+	ctx.JSON(http.StatusOK, employees)
+}
+
+func (e *EmployeeHandler) DeleteEmployee(ctx *gin.Context) {
 	type DeleteReq struct {
 		Id int64 `json:"id"`
 	}
-
 	var req DeleteReq
-	if err := ctx.Bind(&req); err != nil {
-		ctx.String(http.StatusOK, "删除失败, 系统错误")
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, 系统错误"})
 		return
 	}
-
-	err := e.svc.DeleteEmployee(ctx, domain.Employee{
-		Id: req.Id,
-	})
+	err := e.svc.DeleteEmployee(ctx, req.Id)
 	if err != nil {
-		ctx.String(http.StatusOK, "系统错误")
+		ctx.JSON(http.StatusOK, gin.H{"message": "系统错误"})
 		return
 	}
-	ctx.String(http.StatusOK, "删除成功")
+	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }

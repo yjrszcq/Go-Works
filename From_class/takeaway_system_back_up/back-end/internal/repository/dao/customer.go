@@ -65,31 +65,47 @@ func (dao *CustomerDAO) FindCustomerById(ctx context.Context, id int64) (Custome
 	return c, err
 }
 
-func (dao *CustomerDAO) UpdateCustomer(ctx context.Context, c Customer) error {
-	now := time.Now()
-	c.UpdatedAt = now
-	err := dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
-		Name:      c.Name,
-		Email:     c.Email,
-		Phone:     c.Phone,
-		Address:   c.Address,
-		UpdatedAt: c.UpdatedAt,
-	}).Error
-	if err != nil {
-		return err
-	}
-	if c.Password != "" {
-		err = dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
-			Password: c.Password,
-		}).Error
-	}
-	return err
+func (dao *CustomerDAO) FindCustomerByName(ctx context.Context, name string) ([]Customer, error) {
+	var customers []Customer
+	err := dao.db.WithContext(ctx).Where("name LIKE ?", "%"+name+"%").Find(&customers).Error
+	return customers, err
 }
 
 func (dao *CustomerDAO) FindAllCustomers(ctx context.Context) ([]Customer, error) {
 	var customers []Customer
 	err := dao.db.WithContext(ctx).Find(&customers).Error
 	return customers, err
+}
+
+func (dao *CustomerDAO) UpdateCustomer(ctx context.Context, c Customer) error {
+	err := dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
+		Name:      c.Name,
+		Email:     c.Email,
+		Phone:     c.Phone,
+		Address:   c.Address,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
+}
+
+func (dao *CustomerDAO) UpdateCustomerPassword(ctx context.Context, c Customer) error {
+	err := dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
+		Password:  c.Password,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
+}
+
+func (dao *CustomerDAO) UpdateCustomerAll(ctx context.Context, c Customer) error {
+	err := dao.db.WithContext(ctx).Model(&Customer{}).Where("customer_id = ?", c.CustomerID).Updates(Customer{
+		Name:      c.Name,
+		Email:     c.Email,
+		Password:  c.Password,
+		Phone:     c.Phone,
+		Address:   c.Address,
+		UpdatedAt: time.Now(),
+	}).Error
+	return err
 }
 
 func (dao *CustomerDAO) DeleteCustomer(ctx context.Context, id int64) error {
