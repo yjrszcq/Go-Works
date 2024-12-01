@@ -131,7 +131,7 @@ func (svc *CustomerService) LogInCustomer(ctx *gin.Context, email string, passwo
 	sess := sessions.Default(ctx)
 	sess.Set("role", "customer")
 	sess.Set("id", customer.Id)
-	sess.Set("status", "normal")
+	sess.Set("status", "available")
 	err = sess.Save()
 	if err != nil {
 		return err

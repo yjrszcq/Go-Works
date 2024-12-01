@@ -34,5 +34,11 @@ func (l *LoginMiddlewareBuilder) Build() gin.HandlerFunc {
 			ctx.AbortWithStatus(http.StatusUnauthorized)
 			return
 		}
+		status := sess.Get("status")
+		if status == "unavailable" {
+			// 账号不可用
+			ctx.AbortWithStatus(http.StatusForbidden)
+			return
+		}
 	}
 }
