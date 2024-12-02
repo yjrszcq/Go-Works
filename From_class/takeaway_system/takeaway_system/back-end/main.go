@@ -59,7 +59,7 @@ func initWebServer() *gin.Engine {
 				// 开发环境
 				return true
 			}
-			return strings.Contains(origin, "szcq.top")
+			return strings.Contains(origin, "szcq.cyou")
 		},
 		MaxAge: 12 * time.Second,
 	}))
