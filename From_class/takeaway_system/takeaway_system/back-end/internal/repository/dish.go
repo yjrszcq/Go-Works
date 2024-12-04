@@ -22,10 +22,11 @@ func NewDishRepository(dao *dao.DishDAO) *DishRepository {
 
 func (r *DishRepository) CreateDish(ctx context.Context, d domain.Dish) error {
 	return r.dao.InsertDish(ctx, dao.Dish{
-		Name:       d.Name,
-		ImageURL:   d.ImageURL,
-		Price:      d.Price,
-		CategoryID: d.CategoryID,
+		Name:        d.Name,
+		ImageURL:    d.ImageURL,
+		Price:       d.Price,
+		Description: d.Description,
+		CategoryID:  d.CategoryID,
 	})
 }
 
@@ -35,13 +36,14 @@ func (r *DishRepository) FindDishById(ctx context.Context, id int64) (domain.Dis
 		return domain.Dish{}, err
 	}
 	return domain.Dish{
-		Id:         d.DishID,
-		Name:       d.Name,
-		ImageURL:   d.ImageURL,
-		Price:      d.Price,
-		CategoryID: d.CategoryID,
-		CreatedAt:  d.CreatedAt,
-		UpdatedAt:  d.UpdatedAt,
+		Id:          d.DishID,
+		Name:        d.Name,
+		ImageURL:    d.ImageURL,
+		Price:       d.Price,
+		Description: d.Description,
+		CategoryID:  d.CategoryID,
+		CreatedAt:   d.CreatedAt,
+		UpdatedAt:   d.UpdatedAt,
 	}, nil
 }
 
@@ -53,11 +55,12 @@ func (r *DishRepository) FindDishByName(ctx context.Context, name string) ([]dom
 	var dishes []domain.Dish
 	for _, d := range ds {
 		dishes = append(dishes, domain.Dish{
-			Id:         d.DishID,
-			Name:       d.Name,
-			ImageURL:   d.ImageURL,
-			Price:      d.Price,
-			CategoryID: d.CategoryID,
+			Id:          d.DishID,
+			Name:        d.Name,
+			ImageURL:    d.ImageURL,
+			Price:       d.Price,
+			Description: d.Description,
+			CategoryID:  d.CategoryID,
 		})
 	}
 	return dishes, nil
@@ -71,11 +74,12 @@ func (r *DishRepository) FindDishByCategoryID(ctx context.Context, categoryID in
 	var dishes []domain.Dish
 	for _, d := range ds {
 		dishes = append(dishes, domain.Dish{
-			Id:         d.DishID,
-			Name:       d.Name,
-			ImageURL:   d.ImageURL,
-			Price:      d.Price,
-			CategoryID: d.CategoryID,
+			Id:          d.DishID,
+			Name:        d.Name,
+			ImageURL:    d.ImageURL,
+			Price:       d.Price,
+			Description: d.Description,
+			CategoryID:  d.CategoryID,
 		})
 	}
 	return dishes, nil
@@ -89,11 +93,12 @@ func (r *DishRepository) FindAllDishes(ctx context.Context) ([]domain.Dish, erro
 	var dishes []domain.Dish
 	for _, d := range ds {
 		dishes = append(dishes, domain.Dish{
-			Id:         d.DishID,
-			Name:       d.Name,
-			ImageURL:   d.ImageURL,
-			Price:      d.Price,
-			CategoryID: d.CategoryID,
+			Id:          d.DishID,
+			Name:        d.Name,
+			ImageURL:    d.ImageURL,
+			Price:       d.Price,
+			Description: d.Description,
+			CategoryID:  d.CategoryID,
 		})
 	}
 	return dishes, nil
@@ -101,11 +106,12 @@ func (r *DishRepository) FindAllDishes(ctx context.Context) ([]domain.Dish, erro
 
 func (r *DishRepository) UpdateDish(ctx context.Context, d domain.Dish) error {
 	return r.dao.UpdateDish(ctx, dao.Dish{
-		DishID:     d.Id,
-		Name:       d.Name,
-		ImageURL:   d.ImageURL,
-		Price:      d.Price,
-		CategoryID: d.CategoryID,
+		DishID:      d.Id,
+		Name:        d.Name,
+		ImageURL:    d.ImageURL,
+		Price:       d.Price,
+		Description: d.Description,
+		CategoryID:  d.CategoryID,
 	})
 }
 

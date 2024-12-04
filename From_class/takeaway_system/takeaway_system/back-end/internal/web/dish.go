@@ -26,6 +26,8 @@ func (d *DishHandler) ErrOutputForDish(ctx *gin.Context, err error) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 菜品名称格式错误"})
 	} else if errors.Is(err, service.ErrFormatForImageUrlInDish) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 图片链接格式错误"})
+	} else if errors.Is(err, service.ErrFormatForDishDescInDish) {
+		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 菜品描述应在200字符以内"})
 	} else if errors.Is(err, service.ErrRangeForPriceInDish) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 价格范围错误"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInCategory) {
@@ -37,17 +39,18 @@ func (d *DishHandler) ErrOutputForDish(ctx *gin.Context, err error) {
 
 func (d *DishHandler) CreateDish(ctx *gin.Context) {
 	type CreateReq struct {
-		Name       string  `json:"name"`
-		ImageURL   string  `json:"image_url"`
-		Price      float64 `json:"price"`
-		CategoryID int64   `json:"category_id"`
+		Name        string  `json:"name"`
+		ImageURL    string  `json:"image_url"`
+		Price       float64 `json:"price"`
+		Description string  `json:"description"`
+		CategoryID  int64   `json:"category_id"`
 	}
 	var req CreateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusOK, gin.H{"message": "创建失败, JSON字段不匹配"})
 		return
 	}
-	err := d.svc.CreateDish(ctx, req.Name, req.ImageURL, req.Price, req.CategoryID)
+	err := d.svc.CreateDish(ctx, req.Name, req.ImageURL, req.Price, req.Description, req.CategoryID)
 	if err != nil {
 		d.ErrOutputForDish(ctx, err)
 		return
@@ -117,18 +120,19 @@ func (d *DishHandler) GetAllDishes(ctx *gin.Context) {
 
 func (d *DishHandler) EditDish(ctx *gin.Context) {
 	type EditReq struct {
-		Id         int64   `json:"id"`
-		Name       string  `json:"name"`
-		ImageURL   string  `json:"image_url"`
-		Price      float64 `json:"price"`
-		CategoryID int64   `json:"category_id"`
+		Id          int64   `json:"id"`
+		Name        string  `json:"name"`
+		ImageURL    string  `json:"image_url"`
+		Price       float64 `json:"price"`
+		Description string  `json:"description"`
+		CategoryID  int64   `json:"category_id"`
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		ctx.JSON(http.StatusOK, gin.H{"message": "编辑失败, JSON字段不匹配"})
 		return
 	}
-	err := d.svc.EditDish(ctx, req.Id, req.Name, req.ImageURL, req.Price, req.CategoryID)
+	err := d.svc.EditDish(ctx, req.Id, req.Name, req.ImageURL, req.Price, req.Description, req.CategoryID)
 	if err != nil {
 		d.ErrOutputForDish(ctx, err)
 		return
