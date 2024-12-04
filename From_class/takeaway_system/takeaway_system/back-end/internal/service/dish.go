@@ -22,7 +22,7 @@ var (
 const (
 	dishNameRegexPattern = `^[a-zA-Z0-9\u4e00-\u9fa5 ]{1,20}$`
 	imageURLRegexPattern = `^(?:[a-zA-Z]:\\|\/)?(?:[^\\\/:*?"<>|\r\n]+[\\\/])*[^\\\/:*?"<>|\r\n]+\.(jpg|jpeg|png|gif|bmp)$|^https?:\/\/.*\.(?:png|jpg|jpeg|gif|bmp|webp)$`
-	dishDescRegexPattern = `^.{0,200}$`
+	dishDescRegexPattern = `(?s)^.{0,200}$`
 	dishPriceMin         = 0.01
 	dishPriceMax         = 9999.99
 )
