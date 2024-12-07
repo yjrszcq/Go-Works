@@ -137,6 +137,8 @@ func (svc *EmployeeService) LogInEmployee(ctx *gin.Context, email string, passwo
 		sess.Set("role", "employee")
 	case "送餐员":
 		sess.Set("role", "deliveryman")
+	case "未分配":
+		sess.Set("role", "unassigned")
 	}
 	sess.Set("id", employee.Id)
 	switch employee.Status {
