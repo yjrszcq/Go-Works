@@ -42,6 +42,8 @@ func (e *EmployeeHandler) ErrOutputForEmployee(ctx *gin.Context, err error) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 状态不存在"})
 	} else if errors.Is(err, service.ErrPasswordIsWrongInEmployee) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "失败, 密码错误"})
+	} else if errors.Is(err, service.ErrUnassignedEmployeeMustUnavailableInEmployee) {
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "失败, 未分配员工不可用"})
 	} else {
 		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}

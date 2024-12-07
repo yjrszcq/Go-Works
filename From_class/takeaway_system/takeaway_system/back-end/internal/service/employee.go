@@ -11,19 +11,20 @@ import (
 )
 
 var (
-	ErrUserHasNoPermissionInEmployee    = errors.New("无权限")
-	ErrUserDuplicateEmailInEmployee     = repository.ErrUserDuplicateEmail
-	ErrPasswordIsWrongInEmployee        = errors.New("密码错误")
-	ErrInvalidUserOrPasswordInEmployee  = errors.New("邮箱或密码错误")
-	ErrUserNotFoundInEmployee           = repository.ErrUserNotFound
-	ErrPasswordIsInconsistentInEmployee = errors.New("两次输入的密码不一致")
-	ErrFormatForNameInEmployee          = errors.New("用户名格式错误")
-	ErrFormatForEmailInEmployee         = errors.New("邮箱格式错误")
-	ErrFormatForPasswordInEmployee      = errors.New("密码格式错误")
-	ErrFormatForPhoneInEmployee         = errors.New("手机号格式错误")
-	ErrUserListIsEmptyInEmployee        = errors.New("用户列表为空")
-	ErrRoleInputInEmployee              = errors.New("角色输入错误")
-	ErrStatusInputInEmployee            = errors.New("状态输入错误")
+	ErrUserHasNoPermissionInEmployee               = errors.New("无权限")
+	ErrUserDuplicateEmailInEmployee                = repository.ErrUserDuplicateEmail
+	ErrPasswordIsWrongInEmployee                   = errors.New("密码错误")
+	ErrInvalidUserOrPasswordInEmployee             = errors.New("邮箱或密码错误")
+	ErrUserNotFoundInEmployee                      = repository.ErrUserNotFound
+	ErrPasswordIsInconsistentInEmployee            = errors.New("两次输入的密码不一致")
+	ErrFormatForNameInEmployee                     = errors.New("用户名格式错误")
+	ErrFormatForEmailInEmployee                    = errors.New("邮箱格式错误")
+	ErrFormatForPasswordInEmployee                 = errors.New("密码格式错误")
+	ErrFormatForPhoneInEmployee                    = errors.New("手机号格式错误")
+	ErrUserListIsEmptyInEmployee                   = errors.New("用户列表为空")
+	ErrRoleInputInEmployee                         = errors.New("角色输入错误")
+	ErrStatusInputInEmployee                       = errors.New("状态输入错误")
+	ErrUnassignedEmployeeMustUnavailableInEmployee = errors.New("未分配员工不可用")
 )
 
 type EmployeeService struct {
@@ -362,16 +363,23 @@ func (svc *EmployeeService) EditEmployeeStatus(ctx *gin.Context, id int64, statu
 	if status != "可用" && status != "不可用" {
 		return ErrStatusInputInEmployee
 	}
-	err := svc.repo.UpdateEmployeeStatus(ctx, domain.Employee{
-		Id:     id,
-		Status: status,
-	})
+	employee, err := svc.repo.FindEmployeeById(ctx, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
 			return ErrUserNotFoundInEmployee
 		} else {
 			return err
 		}
+	}
+	if employee.Role == "未分配" && status == "可用" {
+		return ErrUnassignedEmployeeMustUnavailableInEmployee
+	}
+	err = svc.repo.UpdateEmployeeStatus(ctx, domain.Employee{
+		Id:     id,
+		Status: status,
+	})
+	if err != nil {
+		return err
 	}
 	return nil
 }
