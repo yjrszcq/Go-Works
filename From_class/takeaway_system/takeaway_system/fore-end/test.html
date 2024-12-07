@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>登录页面</title>
+    <style>
+        .page {
+            display: none;
+            padding: 20px;
+            border: 1px solid #ccc;
+            width: 300px;
+            margin: 50px auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .button-container {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <section id="login-section" class="page">
+        <h1>登录</h1>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="email">邮箱：</label>
+                <input type="email" id="email" name="email" required>
+            </div>
+            <div class="form-group">
+                <label for="password">密码：</label>
+                <input type="password" id="password" name="password" required>
+            </div>
+            <div class="button-container">
+                <button type="submit" id="submit-login">登录</button>
+                <button type="button" id="register">注册</button>
+            </div>
+        </form>
+    </section>
+
+    <section id="home-section" class="page">
+        <h1>欢迎回家，用户</h1>
+        <button id="logout-button">注销</button>
+    </section>
+
+    <section id="admin-section" class="page">
+        <h1>欢迎回来，管理员</h1>
+        <button id="logout-button">注销</button>
+    </section>
+
+    <section id="delivery-section" class="page">
+        <h1>欢迎回来，送餐员</h1>
+        <button id="logout-button">注销</button>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('#login-section').show();
+
+            $('#login-form').on('submit', function(event) {
+                event.preventDefault();
+                login();
+            });
+
+
+            $('#register').on('click', function() {
+                // 这里是注册逻辑，如果你有注册功能可以在这里实现
+                alert('注册功能尚未实现');
+            });
+        });
+
+        function login() {
+            let email = $('#email').val();
+            let password = $('#password').val();
+        
+            $.ajax({
+                url: 'http://127.0.0.1:1000/customer/login',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ email: email, password: password }),
+                xhrFields: {
+                    withCredentials: true
+                },
+                success: function() {
+                    getProfile();  
+                },
+                error: function() {
+                    showError('登录失败');
+                }
+            });
+        }
+
+        function getProfile() {
+            $.ajax({
+                url: 'http://127.0.0.1:1000/customer/profile',
+                    method: 'GET',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(data) {
+                
+                // 根据角色跳转到不同的页面
+                if (data.Role === '员工') {
+                    
+                } else if (data.Role === '管理员') {
+                    showAdminPage();
+                } else if (data.Role === '送餐员') {
+                    showDeliveryPage() ;
+                } else {
+                    showHomePage();
+                }
+            },
+            error: function() {
+                alert('获取用户信息失败');
+            }
+            });
+        }
+        
+        function showLoginPage() {
+            $('.page').hide();
+            $('#login-section').show();
+        }
+
+        function showHomePage() {
+            $('.page').hide();
+            $('#home-section').show();
+        }
+
+        function showAdminPage() {
+            $('.page').hide();
+            $('#admin-section').show();
+        }
+
+        function showDeliveryPage() {
+            $('.page').hide();
+            $('#delivery-section').show();
+        }
+
+        function showError(message) {
+            alert(message);
+        }
+
+        function getCookie(name) {
+            let nameEQ = `${name}=`;
+            let ca = document.cookie.split(';');
+            for (let i = 0; i < ca.length; i++) {
+                let c = ca[i];
+                while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+    </script>
+</body>
+</html>

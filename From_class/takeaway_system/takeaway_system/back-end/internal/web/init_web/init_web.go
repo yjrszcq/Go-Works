@@ -50,6 +50,9 @@ func RegisterEmployeeRoutes(db *gorm.DB, server *gin.Engine) {
 	ega.GET("/list", e.GetAllEmployees)
 	ega.GET("/find/id", e.GetEmployeeById)
 	ega.GET("/find/name", e.GetEmployeeByName) // 模糊查询
+	ega.GET("/find/role", e.GetEmployeeByRole)
+	ega.GET("/find/status", e.GetEmployeeByStatus)
+	ega.GET("/find/new", e.GetNewEmployees)
 	ega.POST("/delete", e.DeleteEmployee)
 }
 

@@ -55,13 +55,13 @@ func getCurrentEmployeeId(ctx *gin.Context) (int64, error) {
 	sess := sessions.Default(ctx)
 	role := sess.Get("role").(string)
 	if role != "employee" && role != "admin" && role != "deliveryman" {
-		return -1, errors.New("无权限")
+		return -1, ErrUserHasNoPermissionInEmployee
 	}
 	employeeId := sess.Get("id").(int64)
 	return employeeId, nil
 }
 
-func (svc *EmployeeService) SignUpEmployee(ctx *gin.Context, name string, phone string, email string, role string, password string, confirmPassword string) error {
+func (svc *EmployeeService) SignUpEmployee(ctx *gin.Context, name string, phone string, email string, password string, confirmPassword string) error {
 	if confirmPassword != password {
 		return ErrPasswordIsInconsistentInEmployee
 	}
@@ -93,9 +93,6 @@ func (svc *EmployeeService) SignUpEmployee(ctx *gin.Context, name string, phone 
 	if !ok {
 		return ErrFormatForPhoneInEmployee
 	}
-	if role != "员工" && role != "管理员" && role != "送餐员" {
-		return ErrRoleInputInEmployee
-	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
@@ -106,7 +103,6 @@ func (svc *EmployeeService) SignUpEmployee(ctx *gin.Context, name string, phone 
 		Email:    email,
 		Password: password,
 		Phone:    phone,
-		Role:     role,
 	})
 	if err != nil {
 		if errors.Is(err, repository.ErrUserDuplicateEmail) {
@@ -419,6 +415,66 @@ func (svc *EmployeeService) GetEmployeeByName(ctx *gin.Context, name string) ([]
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
 			return nil, ErrUserNotFoundInEmployee
+		} else {
+			return nil, err
+		}
+	}
+	if e == nil {
+		return nil, ErrUserNotFoundInEmployee
+	}
+	return e, nil
+}
+
+func (svc *EmployeeService) GetEmployeeByRole(ctx *gin.Context, role string) ([]domain.Employee, error) {
+	if sessions.Default(ctx).Get("role").(string) != "admin" {
+		return nil, ErrUserHasNoPermissionInEmployee
+	}
+	if role != "管理员" && role != "员工" && role != "送餐员" && role != "未分配" {
+		return nil, ErrRoleInputInEmployee
+	}
+	e, err := svc.repo.FindEmployeeByRole(ctx, role)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return nil, ErrUserListIsEmptyInEmployee
+		} else {
+			return nil, err
+		}
+	}
+	if e == nil {
+		return nil, ErrUserListIsEmptyInEmployee
+	}
+	return e, nil
+}
+
+func (svc *EmployeeService) GetEmployeeByStatus(ctx *gin.Context, status string) ([]domain.Employee, error) {
+	if sessions.Default(ctx).Get("role").(string) != "admin" {
+		return nil, ErrUserHasNoPermissionInEmployee
+	}
+	if status != "可用" && status != "不可用" {
+		return nil, ErrStatusInputInEmployee
+	}
+	e, err := svc.repo.FindEmployeeByStatus(ctx, status)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return nil, ErrUserListIsEmptyInEmployee
+		} else {
+			return nil, err
+		}
+	}
+	if e == nil {
+		return nil, ErrUserListIsEmptyInEmployee
+	}
+	return e, nil
+}
+
+func (svc *EmployeeService) GetNewEmployees(ctx *gin.Context) ([]domain.Employee, error) {
+	if sessions.Default(ctx).Get("role").(string) != "admin" {
+		return nil, ErrUserHasNoPermissionInEmployee
+	}
+	e, err := svc.repo.FindEmployeeByRole(ctx, "未分配")
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return nil, ErrUserListIsEmptyInEmployee
 		} else {
 			return nil, err
 		}

@@ -19,7 +19,6 @@ func NewEmployeeRepository(dao *dao.EmployeeDAO) *EmployeeRepository {
 func (r *EmployeeRepository) CreateEmployee(ctx context.Context, e domain.Employee) error {
 	return r.dao.InsertEmployee(ctx, dao.Employee{
 		Name:     e.Name,
-		Role:     e.Role,
 		Email:    e.Email,
 		Phone:    e.Phone,
 		Password: e.Password,
@@ -70,6 +69,48 @@ func (r *EmployeeRepository) FindEmployeeByEmail(ctx context.Context, email stri
 
 func (r *EmployeeRepository) FindEmployeeByName(ctx context.Context, name string) ([]domain.Employee, error) {
 	employees, err := r.dao.FindEmployeeByName(ctx, name)
+	if err != nil {
+		return nil, err
+	}
+	var result []domain.Employee
+	for _, e := range employees {
+		result = append(result, domain.Employee{
+			Id:        e.EmployeeID,
+			Name:      e.Name,
+			Role:      e.Role,
+			Email:     e.Email,
+			Phone:     e.Phone,
+			Status:    e.Status,
+			CreatedAt: e.CreatedAt,
+			UpdatedAt: e.UpdatedAt,
+		})
+	}
+	return result, nil
+}
+
+func (r *EmployeeRepository) FindEmployeeByRole(ctx context.Context, role string) ([]domain.Employee, error) {
+	employees, err := r.dao.FindEmployeeByRole(ctx, role)
+	if err != nil {
+		return nil, err
+	}
+	var result []domain.Employee
+	for _, e := range employees {
+		result = append(result, domain.Employee{
+			Id:        e.EmployeeID,
+			Name:      e.Name,
+			Role:      e.Role,
+			Email:     e.Email,
+			Phone:     e.Phone,
+			Status:    e.Status,
+			CreatedAt: e.CreatedAt,
+			UpdatedAt: e.UpdatedAt,
+		})
+	}
+	return result, nil
+}
+
+func (r *EmployeeRepository) FindEmployeeByStatus(ctx context.Context, status string) ([]domain.Employee, error) {
+	employees, err := r.dao.FindEmployeeByStatus(ctx, status)
 	if err != nil {
 		return nil, err
 	}

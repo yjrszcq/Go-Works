@@ -52,7 +52,6 @@ func (e *EmployeeHandler) SignUpEmployee(ctx *gin.Context) {
 		Name            string `json:"name"`
 		Phone           string `json:"phone"`
 		Email           string `json:"email"`
-		Role            string `json:"role"`
 		Password        string `json:"password"`
 		ConfirmPassword string `json:"confirm_password"`
 	}
@@ -61,7 +60,7 @@ func (e *EmployeeHandler) SignUpEmployee(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "注册失败, JSON字段不匹配"})
 		return
 	}
-	err := e.svc.SignUpEmployee(ctx, req.Name, req.Phone, req.Email, req.Role, req.Password, req.ConfirmPassword)
+	err := e.svc.SignUpEmployee(ctx, req.Name, req.Phone, req.Email, req.Password, req.ConfirmPassword)
 	if err != nil {
 		e.ErrOutputForEmployee(ctx, err)
 		return
@@ -238,6 +237,49 @@ func (e *EmployeeHandler) GetEmployeeByName(ctx *gin.Context) {
 		return
 	}
 	employees, err := e.svc.GetEmployeeByName(ctx, req.Name)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, employees)
+}
+
+func (e *EmployeeHandler) GetEmployeeByRole(ctx *gin.Context) {
+	type GetReq struct {
+		Role string `json:"role"`
+	}
+	var req GetReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
+		return
+	}
+	employees, err := e.svc.GetEmployeeByRole(ctx, req.Role)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, employees)
+}
+
+func (e *EmployeeHandler) GetEmployeeByStatus(ctx *gin.Context) {
+	type GetReq struct {
+		Status string `json:"status"`
+	}
+	var req GetReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
+		return
+	}
+	employees, err := e.svc.GetEmployeeByStatus(ctx, req.Status)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, employees)
+}
+
+func (e *EmployeeHandler) GetNewEmployees(ctx *gin.Context) {
+	employees, err := e.svc.GetNewEmployees(ctx)
 	if err != nil {
 		e.ErrOutputForEmployee(ctx, err)
 		return

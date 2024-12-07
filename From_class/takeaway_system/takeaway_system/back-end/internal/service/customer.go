@@ -68,7 +68,7 @@ func NewCustomerService(repo *repository.CustomerRepository) *CustomerService {
 func getCurrentCustomerId(ctx *gin.Context) (int64, error) {
 	sess := sessions.Default(ctx)
 	if sess.Get("role").(string) != "customer" {
-		return -1, errors.New("无权限")
+		return -1, ErrUserHasNoPermissionInCustomer
 	}
 	customerId := sess.Get("id").(int64)
 	return customerId, nil
