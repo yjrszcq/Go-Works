@@ -309,6 +309,17 @@ func (svc *EmployeeService) EditEmployeeByAdmin(ctx *gin.Context, id int64, name
 	if status != "可用" && status != "不可用" {
 		return ErrStatusInputInEmployee
 	}
+	employee, err := svc.repo.FindEmployeeById(ctx, id)
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return ErrUserNotFoundInEmployee
+		} else {
+			return err
+		}
+	}
+	if employee.Role == "未分配" && status == "可用" {
+		return ErrUnassignedEmployeeMustUnavailableInEmployee
+	}
 	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 	if err != nil {
 		return err
