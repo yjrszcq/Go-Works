@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	ErrRecordIsEmptyInOrder                  = errors.New("列表为空")
 	ErrRecordNotFoundInOrder                 = repository.ErrOrderNotFound
 	ErrUserHasNoPermissionInOrder            = errors.New("无权限")
 	ErrFormatForDeliveryLocationInOrder      = errors.New("送餐地址格式错误")
@@ -213,13 +214,13 @@ func (svc *OrderService) GetOrdersByCustomerId(ctx *gin.Context) ([]domain.Order
 	orders, err := svc.repo.FindOrdersByCustomerId(ctx, customerId)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderNotFound) {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		} else {
 			return nil, err
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrRecordIsEmptyInOrder
 	}
 	return orders, nil
 }
@@ -232,13 +233,13 @@ func (svc *OrderService) GetOrdersByCustomerIdByEmployee(ctx *gin.Context, custo
 	orders, err := svc.repo.FindOrdersByCustomerId(ctx, customerId)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderNotFound) {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		} else {
 			return nil, err
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrRecordIsEmptyInOrder
 	}
 	return orders, nil
 }
@@ -251,13 +252,13 @@ func (svc *OrderService) GetOrdersByDeliveryPersonId(ctx *gin.Context, deliverym
 	orders, err := svc.repo.FindOrdersByDeliveryPersonId(ctx, deliverymanId)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderNotFound) {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		} else {
 			return nil, err
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrRecordIsEmptyInOrder
 	}
 	return orders, nil
 }
@@ -266,7 +267,7 @@ func (svc *OrderService) GetOrdersByStatus(ctx *gin.Context, status string) ([]d
 	orders, err := svc.repo.FindOrdersByStatus(ctx, status)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderNotFound) {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		} else {
 			return nil, err
 		}
@@ -280,15 +281,15 @@ func (svc *OrderService) GetOrdersByStatus(ctx *gin.Context, status string) ([]d
 			}
 		}
 		if len(customerOrder) == 0 {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		}
 		if customerOrder == nil {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		}
 		return customerOrder, nil
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrRecordIsEmptyInOrder
 	}
 	return orders, nil
 }
@@ -297,7 +298,7 @@ func (svc *OrderService) GetOrdersByPaymentStatus(ctx *gin.Context, paymentStatu
 	orders, err := svc.repo.FindOrdersByPaymentStatus(ctx, paymentStatus)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderNotFound) {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		} else {
 			return nil, err
 		}
@@ -311,15 +312,15 @@ func (svc *OrderService) GetOrdersByPaymentStatus(ctx *gin.Context, paymentStatu
 			}
 		}
 		if len(customerOrder) == 0 {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		}
 		if customerOrder == nil {
-			return nil, ErrRecordNotFoundInOrder
+			return nil, ErrRecordIsEmptyInOrder
 		}
 		return customerOrder, nil
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrRecordIsEmptyInOrder
 	}
 	return orders, nil
 }
@@ -337,7 +338,7 @@ func (svc *OrderService) EmployeeGetOrders(ctx *gin.Context) ([]domain.Order, er
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrEmployeeHasNotOrderCanTake
 	}
 	return orders, nil
 }
@@ -355,7 +356,7 @@ func (svc *OrderService) DeliverymanGetOrdersWaitingForDelivery(ctx *gin.Context
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrDeliverymanHasNotOrderCanTake
 	}
 	return orders, nil
 }
@@ -373,7 +374,7 @@ func (svc *OrderService) DeliverymanGetOrdersDelivering(ctx *gin.Context) ([]dom
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrDeliverymanHasNotDeliveringOrder
 	}
 	employeeId, _ := getCurrentEmployeeId(ctx)
 	deliverymanOrders := make([]domain.Order, 0)
@@ -401,7 +402,7 @@ func (svc *OrderService) DeliverymanGetOrdersDelivered(ctx *gin.Context) ([]doma
 		}
 	}
 	if orders == nil {
-		return nil, ErrRecordNotFoundInOrder
+		return nil, ErrDeliverymanHasNotDeliveredOrder
 	}
 	employeeId, _ := getCurrentEmployeeId(ctx)
 	deliverymanOrders := make([]domain.Order, 0)

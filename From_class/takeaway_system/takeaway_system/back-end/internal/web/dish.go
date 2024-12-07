@@ -18,22 +18,24 @@ func NewDishHandler(svc *service.DishService) *DishHandler {
 }
 
 func (d *DishHandler) ErrOutputForDish(ctx *gin.Context, err error) {
-	if errors.Is(err, service.ErrRecordNotFoundInDish) {
+	if errors.Is(err, service.ErrRecordIsEmptyInDish) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无菜品"})
+	} else if errors.Is(err, service.ErrRecordNotFoundInDish) {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 菜品不存在"})
 	} else if errors.Is(err, service.ErrUserHasNoPermissionInDish) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrFormatForDishNameInDish) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 菜品名称格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 菜品名称格式错误"})
 	} else if errors.Is(err, service.ErrFormatForImageUrlInDish) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 图片链接格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 图片链接格式错误"})
 	} else if errors.Is(err, service.ErrFormatForDishDescInDish) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 菜品描述应在200字符以内"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 菜品描述应在200字符以内"})
 	} else if errors.Is(err, service.ErrRangeForPriceInDish) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 价格范围错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 价格范围错误"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInCategory) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 分类不存在"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 分类不存在"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -47,7 +49,7 @@ func (d *DishHandler) CreateDish(ctx *gin.Context) {
 	}
 	var req CreateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "创建失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "创建失败, JSON字段不匹配"})
 		return
 	}
 	err := d.svc.CreateDish(ctx, req.Name, req.ImageURL, req.Price, req.Description, req.CategoryID)
@@ -64,7 +66,7 @@ func (d *DishHandler) GetDishById(ctx *gin.Context) {
 	}
 	var req FindReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	dish, err := d.svc.FindDishById(ctx, req.Id)
@@ -81,7 +83,7 @@ func (d *DishHandler) GetDishByName(ctx *gin.Context) {
 	}
 	var req FindReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	dishes, err := d.svc.FindDishByName(ctx, req.Name)
@@ -98,7 +100,7 @@ func (d *DishHandler) GetDishByCategory(ctx *gin.Context) {
 	}
 	var req FindReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	dishes, err := d.svc.FindDishByCategory(ctx, req.CategoryID)
@@ -129,7 +131,7 @@ func (d *DishHandler) EditDish(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "编辑失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "编辑失败, JSON字段不匹配"})
 		return
 	}
 	err := d.svc.EditDish(ctx, req.Id, req.Name, req.ImageURL, req.Price, req.Description, req.CategoryID)
@@ -146,7 +148,7 @@ func (d *DishHandler) DeleteDish(ctx *gin.Context) {
 	}
 	var req DeleteReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "删除失败, JSON字段不匹配"})
 		return
 	}
 	err := d.svc.DeleteDish(ctx, req.Id)

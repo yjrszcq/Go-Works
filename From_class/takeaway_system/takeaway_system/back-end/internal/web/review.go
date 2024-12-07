@@ -18,22 +18,24 @@ func NewReviewHandler(svc *service.ReviewService) *ReviewHandler {
 }
 
 func (r *ReviewHandler) ErrOutputForReview(ctx *gin.Context, err error) {
-	if errors.Is(err, service.ErrRecordNotFoundInReview) {
+	if errors.Is(err, service.ErrRecordIsEmptyInReview) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无评价"})
+	} else if errors.Is(err, service.ErrRecordNotFoundInReview) {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 评价不存在"})
 	} else if errors.Is(err, service.ErrUserHasNoPermissionInReview) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrCustomerDoNotHaveOrderItem) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 用户没有此订单项, 无法评价"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 用户没有此订单项, 无法评价"})
 	} else if errors.Is(err, service.ErrOrderItemReviewStatusInReview) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 订单项评价状态错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 订单项评价状态错误"})
 	} else if errors.Is(err, service.ErrUpdateOrderItemStatusInReview) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 更新订单项评价状态失败"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 更新订单项评价状态失败"})
 	} else if errors.Is(err, service.ErrRatingOutOfRangeInReview) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 评分应在1-5之间"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 评分应在1-5之间"})
 	} else if errors.Is(err, service.ErrFormatForCommentInReview) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 评价应在200个字符以内"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 评价应在200个字符以内"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -45,7 +47,7 @@ func (r *ReviewHandler) CreateReview(ctx *gin.Context) {
 	}
 	var req CreateReviewReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "创建失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "创建失败, JSON字段不匹配"})
 		return
 	}
 	err := r.svc.CreateReview(ctx, req.OrderItemId, req.Rating, req.Comment)
@@ -62,7 +64,7 @@ func (r *ReviewHandler) GetReviewById(ctx *gin.Context) {
 	}
 	var req GetReviewByIdReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	review, err := r.svc.FindReviewById(ctx, req.Id)
@@ -79,7 +81,7 @@ func (r *ReviewHandler) GetReviewsByDishId(ctx *gin.Context) {
 	}
 	var req GetReviewsByDishIdReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	reviews, err := r.svc.FindReviewsByDishId(ctx, req.DishId)
@@ -96,7 +98,7 @@ func (r *ReviewHandler) GetReviewsByRating(ctx *gin.Context) {
 	}
 	var req GetReviewsByRatingReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	reviews, err := r.svc.FindReviewsByRating(ctx, req.Rating)
@@ -124,7 +126,7 @@ func (r *ReviewHandler) EditReview(ctx *gin.Context) {
 	}
 	var req UpdateReviewReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "更新失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "更新失败, JSON字段不匹配"})
 		return
 	}
 	err := r.svc.EditReview(ctx, req.Id, req.Rating, req.Comment)
@@ -141,7 +143,7 @@ func (r *ReviewHandler) DeleteReview(ctx *gin.Context) {
 	}
 	var req DeleteReviewReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "删除失败, JSON字段不匹配"})
 		return
 	}
 	err := r.svc.DeleteReview(ctx, req.Id)

@@ -11,6 +11,7 @@ import (
 
 var (
 	ErrDuplicateNameInCategory        = repository.ErrCategoryDuplicateName
+	ErrRecordIsEmptyInCategory        = errors.New("列表为空")
 	ErrRecordNotFoundInCategory       = repository.ErrCategoryNotFound
 	ErrUserHasNoPermissionInCategory  = errors.New("无权限")
 	ErrFormatForNameInCategory        = errors.New("分类名称应小于20个字符")
@@ -99,13 +100,13 @@ func (svc *CategoryService) FindAllCategories(ctx *gin.Context) ([]domain.Catego
 	c, err := svc.repo.FindAllCategories(ctx)
 	if err != nil {
 		if errors.Is(err, repository.ErrCategoryNotFound) {
-			return nil, ErrRecordNotFoundInCategory
+			return nil, ErrRecordIsEmptyInCategory
 		} else {
 			return nil, err
 		}
 	}
 	if c == nil {
-		return nil, ErrRecordNotFoundInCategory
+		return nil, ErrRecordIsEmptyInCategory
 	}
 	return c, nil
 }

@@ -19,31 +19,31 @@ func NewEmployeeHandler(svc *service.EmployeeService) *EmployeeHandler {
 
 func (e *EmployeeHandler) ErrOutputForEmployee(ctx *gin.Context, err error) {
 	if errors.Is(err, service.ErrUserHasNoPermissionInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrUserDuplicateEmailInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱冲突"})
+		ctx.JSON(http.StatusConflict, gin.H{"message": "失败, 邮箱冲突"})
 	} else if errors.Is(err, service.ErrInvalidUserOrPasswordInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱或密码错误"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "失败, 邮箱或密码错误"})
 	} else if errors.Is(err, service.ErrFormatForNameInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 姓名格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 姓名格式错误"})
 	} else if errors.Is(err, service.ErrFormatForEmailInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 邮箱格式错误"})
 	} else if errors.Is(err, service.ErrFormatForPasswordInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 密码包含至少一位数字，字母和特殊字符,且长度8-16"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 密码包含至少一位数字，字母和特殊字符,且长度8-16"})
 	} else if errors.Is(err, service.ErrFormatForPhoneInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 请输入11位的中国大陆地区的手机号"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 请输入11位的中国大陆地区的手机号"})
 	} else if errors.Is(err, service.ErrUserListIsEmptyInEmployee) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 用户列表为空"})
 	} else if errors.Is(err, service.ErrUserNotFoundInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 用户不存在"})
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 用户不存在"})
 	} else if errors.Is(err, service.ErrRoleInputInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 角色不存在"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 角色不存在"})
 	} else if errors.Is(err, service.ErrStatusInputInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 状态不存在"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 状态不存在"})
 	} else if errors.Is(err, service.ErrPasswordIsWrongInEmployee) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 密码错误"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "失败, 密码错误"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -76,7 +76,7 @@ func (e *EmployeeHandler) LogInEmployee(ctx *gin.Context) {
 	}
 	var req LogInReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "登录失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "登录失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.LogInEmployee(ctx, req.Email, req.Password)
@@ -95,7 +95,7 @@ func (e *EmployeeHandler) EditEmployee(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.EditEmployee(ctx, req.Name, req.Phone, req.Email)
@@ -114,7 +114,7 @@ func (e *EmployeeHandler) ChangeEmployeePassword(ctx *gin.Context) {
 	}
 	var req ChangeReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.ChangeEmployeePassword(ctx, req.OldPassword, req.NewPassword, req.ConfirmPassword)
@@ -155,7 +155,7 @@ func (e *EmployeeHandler) EditEmployeeByAdmin(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.EditEmployeeByAdmin(ctx, req.Id, req.Name, req.Email, req.Password, req.Phone, req.Role, req.Status)
@@ -173,7 +173,7 @@ func (e *EmployeeHandler) EditEmployeeRole(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.EditEmployeeRole(ctx, req.Id, req.Role)
@@ -191,7 +191,7 @@ func (e *EmployeeHandler) EditEmployeeStatus(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.EditEmployeeStatus(ctx, req.Id, req.Status)
@@ -217,7 +217,7 @@ func (e *EmployeeHandler) GetEmployeeById(ctx *gin.Context) {
 	}
 	var req GetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	employee, err := e.svc.GetEmployeeById(ctx, req.Id)
@@ -234,7 +234,7 @@ func (e *EmployeeHandler) GetEmployeeByName(ctx *gin.Context) {
 	}
 	var req GetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	employees, err := e.svc.GetEmployeeByName(ctx, req.Name)
@@ -251,7 +251,7 @@ func (e *EmployeeHandler) DeleteEmployee(ctx *gin.Context) {
 	}
 	var req DeleteReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "删除失败, JSON字段不匹配"})
 		return
 	}
 	err := e.svc.DeleteEmployee(ctx, req.Id)

@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	ErrRecordIsEmptyInReview         = errors.New("列表为空")
 	ErrRecordNotFoundInReview        = repository.ErrReviewNotFound
 	ErrUserHasNoPermissionInReview   = errors.New("无权限")
 	ErrCustomerDoNotHaveOrderItem    = errors.New("用户没有此订单项，无法评价")
@@ -123,13 +124,13 @@ func (svc *ReviewService) FindReviewsByCustomerId(ctx *gin.Context) ([]domain.Re
 	reviews, err := svc.repo.FindReviewsByCustomerId(ctx, customerId)
 	if err != nil {
 		if errors.Is(err, repository.ErrReviewNotFound) {
-			return nil, ErrRecordNotFoundInReview
+			return nil, ErrRecordIsEmptyInReview
 		} else {
 			return nil, err
 		}
 	}
 	if reviews == nil {
-		return nil, ErrRecordNotFoundInReview
+		return nil, ErrRecordIsEmptyInReview
 	}
 	return reviews, nil
 }
@@ -138,13 +139,13 @@ func (svc *ReviewService) FindReviewsByRating(ctx *gin.Context, rating int) ([]d
 	reviews, err := svc.repo.FindReviewsByRating(ctx, rating)
 	if err != nil {
 		if errors.Is(err, repository.ErrReviewNotFound) {
-			return nil, ErrRecordNotFoundInReview
+			return nil, ErrRecordIsEmptyInReview
 		} else {
 			return nil, err
 		}
 	}
 	if reviews == nil {
-		return nil, ErrRecordNotFoundInReview
+		return nil, ErrRecordIsEmptyInReview
 	}
 	for i := 0; i < len(reviews); i++ {
 		customer, err := GlobalCustomer.FindCustomerById(ctx, reviews[i].CustomerID)
@@ -160,13 +161,13 @@ func (svc *ReviewService) FindReviewsByDishId(ctx *gin.Context, dishId int64) ([
 	reviews, err := svc.repo.FindReviewsByDishId(ctx, dishId)
 	if err != nil {
 		if errors.Is(err, repository.ErrReviewNotFound) {
-			return nil, ErrRecordNotFoundInReview
+			return nil, ErrRecordIsEmptyInReview
 		} else {
 			return nil, err
 		}
 	}
 	if reviews == nil {
-		return nil, ErrRecordNotFoundInReview
+		return nil, ErrRecordIsEmptyInReview
 	}
 	for i := 0; i < len(reviews); i++ {
 		customer, err := GlobalCustomer.FindCustomerById(ctx, reviews[i].CustomerID)

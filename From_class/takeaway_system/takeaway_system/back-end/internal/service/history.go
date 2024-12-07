@@ -9,6 +9,7 @@ import (
 )
 
 var (
+	ErrRecordIsEmptyInOrderStatusHistory       = errors.New("列表为空")
 	ErrRecordNotFoundInOrderStatusHistory      = repository.ErrOrderStatusHistoryNotFound
 	ErrUserHasNoPermissionInOrderStatusHistory = errors.New("无权限")
 )
@@ -53,7 +54,7 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByOrderID(ctx *gin
 	histories, err := svc.repo.FindOrderStatusHistoriesByOrderID(ctx, orderId)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderStatusHistoryNotFound) {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		} else {
 			return nil, err
 		}
@@ -69,11 +70,11 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByOrderID(ctx *gin
 			}
 		}
 		if order.CustomerID != customerId {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		}
 	}
 	if histories == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return histories, nil
 }
@@ -96,7 +97,7 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesAllByCustomer(ctx 
 		result = append(result, histories...)
 	}
 	if result == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return result, nil
 }
@@ -119,7 +120,7 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByStatusByCustomer
 		result = append(result, histories...)
 	}
 	if result == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return result, nil
 }
@@ -142,7 +143,7 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByChangedByIDByCus
 		result = append(result, histories...)
 	}
 	if result == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return result, nil
 }
@@ -155,13 +156,13 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesAllByEmployee(ctx 
 	histories, err := svc.repo.FindOrderStatusHistoriesAll(ctx)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderStatusHistoryNotFound) {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		} else {
 			return nil, err
 		}
 	}
 	if histories == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return histories, nil
 }
@@ -174,13 +175,13 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByStatusByEmployee
 	histories, err := svc.repo.FindOrderStatusHistoriesByStatus(ctx, status)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderStatusHistoryNotFound) {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		} else {
 			return nil, err
 		}
 	}
 	if histories == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return histories, nil
 }
@@ -193,13 +194,13 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByChangedByIDByEmp
 	histories, err := svc.repo.FindOrderStatusHistoriesByChangedByID(ctx, changedById)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderStatusHistoryNotFound) {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		} else {
 			return nil, err
 		}
 	}
 	if histories == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return histories, nil
 }
@@ -208,7 +209,7 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByOrderIDAndStatus
 	histories, err := svc.repo.FindOrderStatusHistoriesByOrderIDAndStatus(ctx, orderId, status)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderStatusHistoryNotFound) {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		} else {
 			return nil, err
 		}
@@ -224,11 +225,11 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByOrderIDAndStatus
 			}
 		}
 		if order.CustomerID != customerId {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		}
 	}
 	if histories == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return histories, nil
 }
@@ -237,7 +238,7 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByOrderIDAndChange
 	histories, err := svc.repo.FindOrderStatusHistoriesByOrderIDAndChangedByID(ctx, orderId, changedById)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderStatusHistoryNotFound) {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		} else {
 			return nil, err
 		}
@@ -253,11 +254,11 @@ func (svc *OrderStatusHistoryService) FindOrderStatusHistoriesByOrderIDAndChange
 			}
 		}
 		if order.CustomerID != customerId {
-			return nil, ErrRecordNotFoundInOrderStatusHistory
+			return nil, ErrRecordIsEmptyInOrderStatusHistory
 		}
 	}
 	if histories == nil {
-		return nil, ErrRecordNotFoundInOrderStatusHistory
+		return nil, ErrRecordIsEmptyInOrderStatusHistory
 	}
 	return histories, nil
 }

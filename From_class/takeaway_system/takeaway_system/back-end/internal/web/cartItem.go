@@ -18,16 +18,18 @@ func NewCartItemHandler(svc *service.CartItemService) *CartItemHandler {
 }
 
 func (c *CartItemHandler) ErrOutputForCartItem(ctx *gin.Context, err error) {
-	if errors.Is(err, service.ErrRecordNotFoundInCartItem) {
+	if errors.Is(err, service.ErrRecordIsEmptyInCartItem) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 购物车为空"})
+	} else if errors.Is(err, service.ErrRecordNotFoundInCartItem) {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 购物车项不存在"})
 	} else if errors.Is(err, service.ErrDishInCartNotFoundInCartItem) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 菜品不存在"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 菜品不存在"})
 	} else if errors.Is(err, service.ErrUserHasNoPermissionInCartItem) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrFormatForQuantityInCartItem) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 数量应大于0, 小于等于99"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 数量应大于0, 小于等于99"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -38,7 +40,7 @@ func (c *CartItemHandler) AddCartItem(ctx *gin.Context) {
 	}
 	var req CreateCartItemReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "添加失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "添加失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.AddCartItem(ctx, req.DishID, req.Quantity)
@@ -64,7 +66,7 @@ func (c *CartItemHandler) GetCartItemById(ctx *gin.Context) {
 	}
 	var req GetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "获取失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "获取失败, JSON字段不匹配"})
 		return
 	}
 	cartItem, err := c.svc.FindCartItemByID(ctx, req.CartItemID)
@@ -82,7 +84,7 @@ func (c *CartItemHandler) EditCartItem(ctx *gin.Context) {
 	}
 	var req UpdateCartItemReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "更新失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "更新失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.UpdateCartItem(ctx, req.CartItemID, req.Quantity)
@@ -99,7 +101,7 @@ func (c *CartItemHandler) DeleteCartItem(ctx *gin.Context) {
 	}
 	var req DeleteCartItemReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "删除失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.DeleteCartItem(ctx, req.CartItemID)

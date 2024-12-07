@@ -18,18 +18,20 @@ func NewCategoryHandler(svc *service.CategoryService) *CategoryHandler {
 }
 
 func (c *CategoryHandler) ErrOutputForCategory(ctx *gin.Context, err error) {
-	if errors.Is(err, service.ErrRecordNotFoundInCategory) {
+	if errors.Is(err, service.ErrRecordIsEmptyInCategory) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无分类"})
+	} else if errors.Is(err, service.ErrRecordNotFoundInCategory) {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 分类不存在"})
 	} else if errors.Is(err, service.ErrDuplicateNameInCategory) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 分类名称重复"})
+		ctx.JSON(http.StatusConflict, gin.H{"message": "失败, 分类名称重复"})
 	} else if errors.Is(err, service.ErrUserHasNoPermissionInCategory) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrFormatForNameInCategory) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 分类名称应小于20个字符"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 分类名称应小于20个字符"})
 	} else if errors.Is(err, service.ErrFormatForDescriptionInCategory) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 分类描述应小于200个字符"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 分类描述应小于200个字符"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -40,7 +42,7 @@ func (c *CategoryHandler) CreateCategory(ctx *gin.Context) {
 	}
 	var req CreateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "创建失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "创建失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.CreateCategory(ctx, req.Name, req.Description)
@@ -57,7 +59,7 @@ func (c *CategoryHandler) GetCategoryById(ctx *gin.Context) {
 	}
 	var req CreateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	category, err := c.svc.FindCategoryByID(ctx, req.Id)
@@ -74,7 +76,7 @@ func (c *CategoryHandler) GetCategoryByName(ctx *gin.Context) {
 	}
 	var req CreateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	category, err := c.svc.FindCategoryByName(ctx, req.Name)
@@ -102,7 +104,7 @@ func (c *CategoryHandler) EditCategory(ctx *gin.Context) {
 	}
 	var req UpdateReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "更新失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "更新失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.UpdateCategory(ctx, req.Id, req.Name, req.Description)
@@ -119,7 +121,7 @@ func (c *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 	}
 	var req DeleteReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "删除失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.DeleteCategory(ctx, req.Id)

@@ -11,6 +11,7 @@ import (
 )
 
 var (
+	ErrRecordIsEmptyInDish       = errors.New("列表为空")
 	ErrRecordNotFoundInDish      = repository.ErrDishNotFound
 	ErrUserHasNoPermissionInDish = errors.New("无权限")
 	ErrFormatForDishNameInDish   = errors.New("菜品名称格式错误")
@@ -127,13 +128,13 @@ func (svc *DishService) FindDishByCategory(ctx *gin.Context, categoryID int64) (
 	d, err := svc.repo.FindDishByCategoryID(ctx, categoryID)
 	if err != nil {
 		if errors.Is(err, repository.ErrDishNotFound) {
-			return nil, ErrRecordNotFoundInDish
+			return nil, ErrRecordIsEmptyInDish
 		} else {
 			return nil, err
 		}
 	}
 	if d == nil {
-		return nil, ErrRecordNotFoundInDish
+		return nil, ErrRecordIsEmptyInDish
 	}
 	return d, nil
 }
@@ -142,13 +143,13 @@ func (svc *DishService) FindAllDishes(ctx *gin.Context) ([]domain.Dish, error) {
 	d, err := svc.repo.FindAllDishes(ctx)
 	if err != nil {
 		if errors.Is(err, repository.ErrDishNotFound) {
-			return nil, ErrRecordNotFoundInDish
+			return nil, ErrRecordIsEmptyInDish
 		} else {
 			return nil, err
 		}
 	}
 	if d == nil {
-		return nil, ErrRecordNotFoundInDish
+		return nil, ErrRecordIsEmptyInDish
 	}
 	return d, nil
 }

@@ -9,6 +9,7 @@ import (
 
 var (
 	ErrDishInCartNotFoundInCartItem  = repository.ErrCartItemForeignKeyDishConstraintFail
+	ErrRecordIsEmptyInCartItem       = errors.New("列表为空")
 	ErrRecordNotFoundInCartItem      = repository.ErrCartItemNotFound
 	ErrUserHasNoPermissionInCartItem = errors.New("无权限")
 	ErrFormatForQuantityInCartItem   = errors.New("数量应大于0, 小于等于99")
@@ -74,12 +75,12 @@ func (svc *CartItemService) FindCartItemsByCustomerID(ctx *gin.Context) ([]domai
 	c, err := svc.repo.FindCartItemByCustomerID(ctx, id)
 	if err != nil {
 		if errors.Is(err, repository.ErrCartItemNotFound) {
-			return nil, ErrRecordNotFoundInCartItem
+			return nil, ErrRecordIsEmptyInCartItem
 		}
 		return nil, err
 	}
 	if c == nil {
-		return nil, ErrRecordNotFoundInCartItem
+		return nil, ErrRecordIsEmptyInCartItem
 	}
 	return c, nil
 }

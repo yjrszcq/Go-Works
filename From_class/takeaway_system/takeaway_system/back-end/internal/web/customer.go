@@ -19,29 +19,29 @@ func NewCustomerHandler(svc *service.CustomerService) *CustomerHandler { // 预�
 
 func (c *CustomerHandler) ErrOutputForCustomer(ctx *gin.Context, err error) {
 	if errors.Is(err, service.ErrUserHasNoPermissionInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrUserDuplicateEmailInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱冲突"})
+		ctx.JSON(http.StatusConflict, gin.H{"message": "失败, 邮箱冲突"})
 	} else if errors.Is(err, service.ErrInvalidUserOrPasswordInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱或密码错误"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "失败, 邮箱或密码错误"})
 	} else if errors.Is(err, service.ErrFormatForNameInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 姓名格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 姓名格式错误"})
 	} else if errors.Is(err, service.ErrFormatForEmailInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 邮箱格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 邮箱格式错误"})
 	} else if errors.Is(err, service.ErrFormatForPasswordInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 密码包含至少一位数字，字母和特殊字符,且长度8-16"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 密码包含至少一位数字，字母和特殊字符,且长度8-16"})
 	} else if errors.Is(err, service.ErrFormatForPhoneInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 请输入11位的中国大陆地区的手机号"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 请输入11位的中国大陆地区的手机号"})
 	} else if errors.Is(err, service.ErrFormatForAddressInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 地址格式错误"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 地址格式错误"})
 	} else if errors.Is(err, service.ErrUserListIsEmptyInCustomer) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 用户列表为空"})
 	} else if errors.Is(err, service.ErrUserNotFoundInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 用户不存在"})
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 用户不存在"})
 	} else if errors.Is(err, service.ErrPasswordIsWrongInCustomer) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 密码错误"})
+		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "失败, 密码错误"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -53,7 +53,7 @@ func (c *CustomerHandler) SignUpCustomer(ctx *gin.Context) {
 	}
 	var req SignUpReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "注册失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "注册失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.SignUpCustomer(ctx, req.Email, req.Password, req.ConfirmPassword)
@@ -72,7 +72,7 @@ func (c *CustomerHandler) LogInCustomer(ctx *gin.Context) {
 
 	var req LogInReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "登录失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "登录失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.LogInCustomer(ctx, req.Email, req.Password)
@@ -92,7 +92,7 @@ func (c *CustomerHandler) EditCustomer(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.EditCustomer(ctx, req.Name, req.Email, req.Phone, req.Address)
@@ -111,7 +111,7 @@ func (c *CustomerHandler) ChangeCustomerPassword(ctx *gin.Context) {
 	}
 	var req ChangePasswordReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.ChangeCustomerPassword(ctx, req.OldPassword, req.NewPassword, req.ConfirmPassword)
@@ -151,7 +151,7 @@ func (c *CustomerHandler) EditCustomerByAdmin(ctx *gin.Context) {
 	}
 	var req EditReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "修改失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "修改失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.EditCustomerByAdmin(ctx, req.Id, req.Name, req.Email, req.Password, req.Phone, req.Address)
@@ -177,7 +177,7 @@ func (c *CustomerHandler) GetCustomerById(ctx *gin.Context) {
 	}
 	var req GetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	customer, err := c.svc.GetCustomerById(ctx, req.Id)
@@ -194,7 +194,7 @@ func (c *CustomerHandler) GetCustomerByName(ctx *gin.Context) {
 	}
 	var req GetReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查询失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查询失败, JSON字段不匹配"})
 		return
 	}
 	customers, err := c.svc.GetCustomerByName(ctx, req.Name)
@@ -211,7 +211,7 @@ func (c *CustomerHandler) DeleteCustomer(ctx *gin.Context) {
 	}
 	var req DeleteReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "删除失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "删除失败, JSON字段不匹配"})
 		return
 	}
 	err := c.svc.DeleteCustomer(ctx, req.Id)

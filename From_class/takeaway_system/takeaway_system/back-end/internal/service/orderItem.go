@@ -10,6 +10,7 @@ import (
 
 var (
 	ErrOrderItemForeignKeyDishConstraintFail = repository.ErrOrderItemForeignKeyDishConstraintFail
+	ErrRecordIsEmptyInOrderItem              = errors.New("列表为空")
 	ErrRecordNotFoundInOrderItem             = repository.ErrOrderItemNotFound
 	ErrUserHasNoPermissionInOrderItem        = errors.New("无权限")
 )
@@ -44,7 +45,7 @@ func (svc *OrderItemService) GetOrderItemById(ctx *gin.Context, id int64) (domai
 			}
 		}
 		if order.CustomerID != customerId {
-			return domain.OrderItem{}, ErrRecordNotFoundInOrderItem
+			return domain.OrderItem{}, ErrRecordNotFoundInOrder
 		}
 	}
 	return orderItem, nil
@@ -62,19 +63,19 @@ func (svc *OrderItemService) GetOrderItemsByOrderId(ctx *gin.Context, orderId in
 			}
 		}
 		if order.CustomerID != id {
-			return nil, ErrRecordNotFoundInOrderItem
+			return nil, ErrRecordNotFoundInOrder
 		}
 	}
 	orderItems, err := svc.repo.FindOrderItemsByOrderId(ctx, orderId)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderItemNotFound) {
-			return nil, ErrRecordNotFoundInOrderItem
+			return nil, ErrRecordIsEmptyInOrderItem
 		} else {
 			return nil, err
 		}
 	}
 	if orderItems == nil {
-		return nil, ErrRecordNotFoundInOrderItem
+		return nil, ErrRecordIsEmptyInOrderItem
 	}
 	return orderItems, nil
 }
@@ -86,13 +87,13 @@ func (svc *OrderItemService) GetOrderItemsByDishId(ctx *gin.Context, dishId int6
 	orderItems, err := svc.repo.FindOrderItemsByDishId(ctx, dishId)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderItemNotFound) {
-			return nil, ErrRecordNotFoundInOrderItem
+			return nil, ErrRecordIsEmptyInOrderItem
 		} else {
 			return nil, err
 		}
 	}
 	if orderItems == nil {
-		return nil, ErrRecordNotFoundInOrderItem
+		return nil, ErrRecordIsEmptyInOrderItem
 	}
 	return orderItems, nil
 }
@@ -119,7 +120,7 @@ func (svc *OrderItemService) GetOrderItemsByDishIdByCustomer(ctx *gin.Context, d
 		}
 	}
 	if len(orderItems) == 0 {
-		return nil, ErrRecordNotFoundInOrderItem
+		return nil, ErrRecordIsEmptyInOrderItem
 	}
 	return orderItems, nil
 }
@@ -146,7 +147,7 @@ func (svc *OrderItemService) GetOrderItemsByReviewStatus(ctx *gin.Context, statu
 		}
 	}
 	if len(orderItems) == 0 {
-		return nil, ErrRecordNotFoundInOrderItem
+		return nil, ErrRecordIsEmptyInOrderItem
 	}
 	return orderItems, nil
 }
@@ -169,7 +170,7 @@ func (svc *OrderItemService) GetAllOrderItemsByCustomer(ctx *gin.Context) ([]dom
 		orderItems = append(orderItems, tempOrderItems...)
 	}
 	if len(orderItems) == 0 {
-		return nil, ErrRecordNotFoundInOrderItem
+		return nil, ErrRecordIsEmptyInOrderItem
 	}
 	return orderItems, nil
 }
@@ -181,13 +182,13 @@ func (svc *OrderItemService) GetAllOrderItemsByEmployee(ctx *gin.Context) ([]dom
 	orderItems, err := svc.repo.FindAllOrderItems(ctx)
 	if err != nil {
 		if errors.Is(err, repository.ErrOrderItemNotFound) {
-			return nil, ErrRecordNotFoundInOrderItem
+			return nil, ErrRecordIsEmptyInOrderItem
 		} else {
 			return nil, err
 		}
 	}
 	if orderItems == nil {
-		return nil, ErrRecordNotFoundInOrderItem
+		return nil, ErrRecordIsEmptyInOrderItem
 	}
 	return orderItems, nil
 }

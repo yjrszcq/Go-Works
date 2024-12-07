@@ -18,14 +18,16 @@ func NewOrderStatusHistoryHandler(svc *service.OrderStatusHistoryService) *Order
 }
 
 func (o *OrderStatusHistoryHandler) ErrOutputForOrderStatusHistory(ctx *gin.Context, err error) {
-	if errors.Is(err, service.ErrRecordNotFoundInOrderStatusHistory) {
+	if errors.Is(err, service.ErrRecordIsEmptyInOrderStatusHistory) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无订单状态历史记录"})
+	} else if errors.Is(err, service.ErrRecordNotFoundInOrderStatusHistory) {
+		ctx.JSON(http.StatusNotFound, gin.H{"message": "失败, 订单状态历史记录不存在"})
 	} else if errors.Is(err, service.ErrUserHasNoPermissionInOrderStatusHistory) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 无权限"})
+		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInOrder) {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 订单不存在"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 订单不存在"})
 	} else {
-		ctx.JSON(http.StatusOK, gin.H{"message": "失败, 系统错误"})
+		ctx.JSON(http.StatusInternalServerError, gin.H{"message": "失败, 系统错误"})
 	}
 }
 
@@ -35,7 +37,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoryByID(ctx *gin.Context)
 	}
 	var req FindOrderStatusHistoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	history, err := o.svc.FindOrderStatusHistoryByID(ctx, req.Id)
@@ -52,7 +54,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByOrderID(ctx *gin.C
 	}
 	var req FindOrderStatusHistoriesByOrderIDReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByOrderID(ctx, req.OrderId)
@@ -78,7 +80,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByStatusByCustomer(c
 	}
 	var req FindOrderStatusHistoriesByStatusReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByStatusByCustomer(ctx, req.Status)
@@ -95,7 +97,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByChangedByIDByCusto
 	}
 	var req FindOrderStatusHistoriesByChangedByIDReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByChangedByIDByCustomer(ctx, req.ChangedById)
@@ -121,7 +123,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByStatusByEmployee(c
 	}
 	var req FindOrderStatusHistoriesByStatusReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByStatusByEmployee(ctx, req.Status)
@@ -138,7 +140,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByChangedByIDByEmplo
 	}
 	var req FindOrderStatusHistoriesByChangedByIDReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByChangedByIDByEmployee(ctx, req.ChangedById)
@@ -156,7 +158,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByOrderIDAndStatus(c
 	}
 	var req FindOrderStatusHistoriesByOrderIDAndStatusReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByOrderIDAndStatus(ctx, req.OrderId, req.Status)
@@ -174,7 +176,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByOrderIDAndChangedB
 	}
 	var req FindOrderStatusHistoriesByOrderIDAndChangedByIDReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		ctx.JSON(http.StatusOK, gin.H{"message": "查找失败, JSON字段不匹配"})
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "查找失败, JSON字段不匹配"})
 		return
 	}
 	histories, err := o.svc.FindOrderStatusHistoriesByOrderIDAndChangedByID(ctx, req.OrderId, req.ChangedById)
