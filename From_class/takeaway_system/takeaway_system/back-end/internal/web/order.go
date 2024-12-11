@@ -86,12 +86,12 @@ func (o *OrderHandler) CreateOrder(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "创建失败, JSON字段不匹配"})
 		return
 	}
-	err := o.svc.CreateOrder(ctx, req.DeliveryLocation, req.DeliveryTime, req.CartItemId)
+	order, err := o.svc.CreateOrder(ctx, req.DeliveryLocation, req.DeliveryTime, req.CartItemId)
 	if err != nil {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "创建成功"})
+	ctx.JSON(http.StatusOK, order)
 }
 
 func (o *OrderHandler) PayTheOrder(ctx *gin.Context) {

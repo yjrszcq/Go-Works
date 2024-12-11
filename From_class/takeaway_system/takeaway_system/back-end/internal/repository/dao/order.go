@@ -34,7 +34,7 @@ func NewOrderDAO(db *gorm.DB) *OrderDAO {
 	return &OrderDAO{db: db}
 }
 
-func (dao *OrderDAO) InsertOrder(ctx context.Context, o Order) (int64, error) {
+func (dao *OrderDAO) InsertOrder(ctx context.Context, o Order) (Order, error) {
 	now := time.Now()
 	o.OrderDate = now
 	o.CreatedAt = now
@@ -46,9 +46,9 @@ func (dao *OrderDAO) InsertOrder(ctx context.Context, o Order) (int64, error) {
 	o.PaymentStatus = "待支付"
 	err := dao.db.WithContext(ctx).Create(&o).Error
 	if err != nil {
-		return 0, err
+		return Order{}, err
 	}
-	return o.OrderID, err
+	return o, err
 }
 
 func (dao *OrderDAO) FindOrderByID(ctx context.Context, id int64) (Order, error) {

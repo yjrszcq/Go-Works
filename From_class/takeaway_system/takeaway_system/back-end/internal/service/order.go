@@ -48,11 +48,11 @@ func NewOrderService(repo *repository.OrderRepository) *OrderService {
 	}
 }
 
-func (svc *OrderService) CreateOrder(ctx *gin.Context, deliveryLocation string, deliveryTimeString string, cartItemIds []int64) error {
+func (svc *OrderService) CreateOrder(ctx *gin.Context, deliveryLocation string, deliveryTimeString string, cartItemIds []int64) (domain.Order, error) {
 	id, err := getCurrentCustomerId(ctx)
 	if err != nil {
 		ctx.JSON(http.StatusOK, gin.H{"message": "无权限"})
-		return ErrUserHasNoPermissionInOrder
+		return domain.Order{}, ErrUserHasNoPermissionInOrder
 	}
 	var deliveryTime time.Time
 	if deliveryTimeString == "" {
@@ -60,22 +60,22 @@ func (svc *OrderService) CreateOrder(ctx *gin.Context, deliveryLocation string, 
 	} else {
 		deliveryTime, err = time.Parse("2006-01-02 15:04:05", deliveryTimeString)
 		if err != nil {
-			return ErrFormatForDeliveryTimeInOrder
+			return domain.Order{}, ErrFormatForDeliveryTimeInOrder
 		}
 		if deliveryTime.Before(time.Now()) {
 			deliveryTime = time.Now()
 		}
 	}
 	if len(cartItemIds) == 0 {
-		return ErrRecordNotFoundInCartItem
+		return domain.Order{}, ErrRecordNotFoundInCartItem
 	}
 	if deliveryLocation == "" {
 		customer, err := GlobalCustomer.FindCustomerById(ctx, id)
 		if err != nil {
-			return err
+			return domain.Order{}, err
 		}
 		if customer.Address == "" {
-			return ErrEmptyDeliveryLocationInOrder
+			return domain.Order{}, ErrEmptyDeliveryLocationInOrder
 		}
 		deliveryLocation = customer.Address
 	}
@@ -86,63 +86,63 @@ func (svc *OrderService) CreateOrder(ctx *gin.Context, deliveryLocation string, 
 		cartItem, err := GlobalCartItem.FindCartItemByID(ctx, v)
 		if err != nil {
 			if errors.Is(err, repository.ErrCartItemNotFound) {
-				return ErrRecordNotFoundInCartItem
+				return domain.Order{}, ErrRecordNotFoundInCartItem
 			} else {
-				return err
+				return domain.Order{}, err
 			}
 		}
 		cartItems = append(cartItems, cartItem)
 		dish, err := GlobalDish.FindDishById(ctx, cartItem.DishID)
 		if err != nil {
 			if errors.Is(err, repository.ErrDishNotFound) {
-				return ErrRecordNotFoundInDish
+				return domain.Order{}, ErrRecordNotFoundInDish
 			} else {
-				return err
+				return domain.Order{}, err
 			}
 		}
 		unitPrice = append(unitPrice, dish.Price)
 		totalAmount += float64(cartItem.Quantity) * dish.Price
 	}
-	orderId, err := svc.repo.CreateOrder(ctx, domain.Order{
+	order, err := svc.repo.CreateOrder(ctx, domain.Order{
 		CustomerID:       id,
 		DeliveryLocation: deliveryLocation,
 		DeliveryTime:     deliveryTime,
 		TotalAmount:      totalAmount,
 	})
 	if err != nil {
-		return err
+		return domain.Order{}, err
 	}
 	// 根据cartItems创建订单项
 	for k, v := range cartItems {
 		err = GlobalOrderItem.CreateOrderItem(ctx, domain.OrderItem{
-			OrderID:   orderId,
+			OrderID:   order.Id,
 			DishID:    v.DishID,
 			Quantity:  v.Quantity,
 			UnitPrice: unitPrice[k],
 		})
 		if err != nil {
 			// 删除已经创建的订单项
-			err = GlobalOrderItem.DeleteOrderItemsByOrderId(ctx, orderId)
+			err = GlobalOrderItem.DeleteOrderItemsByOrderId(ctx, order.Id)
 			if err != nil {
 				if !errors.Is(err, repository.ErrOrderItemNotFound) {
-					return ErrDeleteInvalidOrderItemInOrder
+					return domain.Order{}, ErrDeleteInvalidOrderItemInOrder
 				}
 			}
-			err = GlobalOrder.DeleteOrderById(ctx, orderId)
+			err = GlobalOrder.DeleteOrderById(ctx, order.Id)
 			if err != nil {
-				return ErrDeleteInvalidOrderInOrder
+				return domain.Order{}, ErrDeleteInvalidOrderInOrder
 			}
-			return ErrCreateNewOrderInOrder
+			return domain.Order{}, ErrCreateNewOrderInOrder
 		}
 	}
 	err = GlobalOrderStatusHistory.CreateOrderStatusHistory(ctx, domain.OrderStatusHistory{
-		OrderID: orderId,
+		OrderID: order.Id,
 		Status:  "未支付",
 	})
 	if err != nil {
-		return ErrCreateHistoryInOrder
+		return domain.Order{}, ErrCreateHistoryInOrder
 	}
-	return nil
+	return order, nil
 }
 
 func (svc *OrderService) PayTheOrder(ctx *gin.Context, id int64) error {

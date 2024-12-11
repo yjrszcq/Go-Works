@@ -20,13 +20,29 @@ func NewOrderRepository(dao *dao.OrderDAO) *OrderRepository {
 	}
 }
 
-func (r *OrderRepository) CreateOrder(ctx context.Context, o domain.Order) (int64, error) {
-	return r.dao.InsertOrder(ctx, dao.Order{
+func (r *OrderRepository) CreateOrder(ctx context.Context, o domain.Order) (domain.Order, error) {
+	order, err := r.dao.InsertOrder(ctx, dao.Order{
 		CustomerID:       o.CustomerID,
 		DeliveryLocation: o.DeliveryLocation,
 		TotalAmount:      o.TotalAmount,
 		DeliveryTime:     o.DeliveryTime,
 	})
+	if err != nil {
+		return domain.Order{}, err
+	}
+	return domain.Order{
+		Id:               order.OrderID,
+		CustomerID:       order.CustomerID,
+		DeliveryLocation: order.DeliveryLocation,
+		Status:           order.Status,
+		PaymentStatus:    order.PaymentStatus,
+		TotalAmount:      order.TotalAmount,
+		OrderDate:        order.OrderDate,
+		DeliveryTime:     order.DeliveryTime,
+		DeliveryPersonID: order.DeliveryPersonID,
+		CreatedAt:        order.CreatedAt,
+		UpdatedAt:        order.UpdatedAt,
+	}, err
 }
 
 func (r *OrderRepository) FindOrderById(ctx context.Context, id int64) (domain.Order, error) {
