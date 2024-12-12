@@ -203,6 +203,24 @@ func (e *EmployeeHandler) EditEmployeeStatus(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
 }
 
+func (e *EmployeeHandler) InitEmployeePassword(ctx *gin.Context) {
+	type InitReq struct {
+		Id       int64  `json:"id"`
+		Password string `json:"password"`
+	}
+	var req InitReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "初始化失败, JSON字段不匹配"})
+		return
+	}
+	err := e.svc.InitEmployeePassword(ctx, req.Id, req.Password)
+	if err != nil {
+		e.ErrOutputForEmployee(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "初始化成功"})
+}
+
 func (e *EmployeeHandler) GetAllEmployees(ctx *gin.Context) {
 	employees, err := e.svc.GetAllEmployees(ctx)
 	if err != nil {

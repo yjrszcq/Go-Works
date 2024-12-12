@@ -26,6 +26,14 @@ func initEmployee(db *gorm.DB) *web.EmployeeHandler {
 	return e
 }
 
+func initAdmin(cfg *Config) *web.AdminHandler {
+	svc := service.NewAdminService(cfg.AdminUsername, cfg.AdminPassword)
+	a := web.NewAdminHandler(svc)
+	service.GlobalAdmin = svc
+	service.GlobalDefaultPassword = cfg.DefaultPassword
+	return a
+}
+
 func initDish(db *gorm.DB) *web.DishHandler {
 	dd := dao.NewDishDAO(db)
 	repo := repository.NewDishRepository(dd)

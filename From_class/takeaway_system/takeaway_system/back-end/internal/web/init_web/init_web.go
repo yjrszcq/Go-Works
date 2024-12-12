@@ -5,9 +5,10 @@ import (
 	"gorm.io/gorm"
 )
 
-func RegisterRoutes(db *gorm.DB, server *gin.Engine) {
+func RegisterRoutes(db *gorm.DB, server *gin.Engine, cfg *Config) {
 	RegisterCustomerRoutes(db, server)
 	RegisterEmployeeRoutes(db, server)
+	RegisterAdminRoutes(cfg, server)
 	RegisterDishRoutes(db, server)
 	RegisterCategoryRoutes(db, server)
 	RegisterCartItemRoutes(db, server)
@@ -28,6 +29,7 @@ func RegisterCustomerRoutes(db *gorm.DB, server *gin.Engine) {
 	cg.GET("/logout", c.LogOutCustomer)
 	cga := server.Group("/admin/customer")
 	cga.POST("/edit", c.EditCustomerByAdmin)
+	cga.POST("/edit/init_password", c.InitCustomerPassword)
 	cga.GET("/list", c.GetAllCustomers)
 	cga.POST("/find/id", c.GetCustomerById)
 	cga.POST("/find/name", c.GetCustomerByName) // 模糊查询
@@ -45,6 +47,7 @@ func RegisterEmployeeRoutes(db *gorm.DB, server *gin.Engine) {
 	eg.GET("/logout", e.LogOutEmployee)
 	ega := server.Group("/admin/employee")
 	ega.POST("/edit/all", e.EditEmployeeByAdmin)
+	ega.POST("/edit/init_password", e.InitEmployeePassword)
 	ega.POST("/edit/role", e.EditEmployeeRole)
 	ega.POST("/edit/status", e.EditEmployeeStatus)
 	ega.GET("/list", e.GetAllEmployees)
@@ -54,6 +57,13 @@ func RegisterEmployeeRoutes(db *gorm.DB, server *gin.Engine) {
 	ega.POST("/find/status", e.GetEmployeeByStatus)
 	ega.GET("/find/new", e.GetNewEmployees)
 	ega.POST("/delete", e.DeleteEmployee)
+}
+
+func RegisterAdminRoutes(cfg *Config, server *gin.Engine) {
+	a := initAdmin(cfg)
+	ag := server.Group("/admin")
+	ag.POST("/login", a.LogInAdmin)
+	ag.GET("/logout", a.LogOutAdmin)
 }
 
 func RegisterDishRoutes(db *gorm.DB, server *gin.Engine) {

@@ -171,6 +171,24 @@ func (c *CustomerHandler) GetAllCustomers(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, customers)
 }
 
+func (c *CustomerHandler) InitCustomerPassword(ctx *gin.Context) {
+	type InitReq struct {
+		Id       int64  `json:"id"`
+		Password string `json:"password"`
+	}
+	var req InitReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, gin.H{"message": "初始化失败, JSON字段不匹配"})
+		return
+	}
+	err := c.svc.InitCustomerPassword(ctx, req.Id, req.Password)
+	if err != nil {
+		c.ErrOutputForCustomer(ctx, err)
+		return
+	}
+	ctx.JSON(http.StatusOK, gin.H{"message": "初始化成功"})
+}
+
 func (c *CustomerHandler) GetCustomerById(ctx *gin.Context) {
 	type GetReq struct {
 		Id int64 `json:"id"`

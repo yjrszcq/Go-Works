@@ -16,20 +16,21 @@ import (
 )
 
 func main() {
-	db := initDB()
-	server := initWebServer()
-	init_web.RegisterRoutes(db, server)
-	server.Run(":1000")
+	cfg := init_web.InitConfig()
+	db := initDB(cfg)
+	server := initWebServer(cfg)
+	init_web.RegisterRoutes(db, server, cfg)
+	server.Run(":" + cfg.ServerPort)
 }
 
-func initDB() *gorm.DB {
+func initDB(config *init_web.Config) *gorm.DB {
 	//配置MySQL连接参数
-	username := "root"  //账号
-	password := "1234"  //密码
-	host := "127.0.0.1" //数据库地址，可以是Ip或者域名
-	port := 3306        //数据库端口
-	Dbname := "test"    //数据库名
-	timeout := "10s"    //连接超时，10秒
+	username := config.DbUsername
+	password := config.DbPassword
+	host := config.DbHost
+	port := config.DbPort
+	Dbname := config.DbName
+	timeout := config.DbTimeout
 
 	//拼接下dsn参数, dsn格式可以参考上面的语法，这里使用Sprintf动态拼接dsn参数，因为一般数据库连接参数，我们都是保存在配置文件里面，需要从配置文件加载参数，然后拼接dsn。
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", username, password, host, port, Dbname, timeout)
@@ -48,7 +49,7 @@ func initDB() *gorm.DB {
 	return db
 }
 
-func initWebServer() *gin.Engine {
+func initWebServer(config *init_web.Config) *gin.Engine {
 	server := gin.Default()
 	server.Use(cors.New(cors.Config{ // 解决跨域问题
 		AllowMethods:     []string{"GET", "POST"}, // 可以不写，不写就是所有都支持
@@ -63,16 +64,17 @@ func initWebServer() *gin.Engine {
 				// 开发环境
 				return true
 			}
-			return strings.Contains(origin, "szcq.cyou")
+			return strings.Contains(origin, config.AllowHost)
 		},
 		MaxAge: 12 * time.Second,
 	}))
 	// 登录校验
-	store := cookie.NewStore([]byte("secret"))  // 存 sessions 数据的地方
-	server.Use(sessions.Sessions("sid", store)) // cookie 的名字和值(store)
+	store := cookie.NewStore([]byte("secret"))              // 存 sessions 数据的地方
+	server.Use(sessions.Sessions(config.CookieName, store)) // cookie 的名字和值(store)
 	server.Use(middleware.NewLoginMiddlewareBuilder().
 		IgnorePaths("/customer/signup", "/customer/login").
 		IgnorePaths("/employee/signup", "/employee/login").
+		IgnorePaths("/admin/login", "/admin/logout").
 		IgnorePaths("/dish/list", "/dish/find/id", "/dish/find/name", "/dish/find/category").
 		IgnorePaths("/category/list", "/category/find/id", "/category/find/name").
 		IgnorePaths("/review/find/id", "/review/find/dish_id", "/review/find/rating").

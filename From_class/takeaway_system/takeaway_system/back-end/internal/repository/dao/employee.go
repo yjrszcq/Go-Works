@@ -11,7 +11,7 @@ import (
 type Employee struct {
 	EmployeeID int64     `gorm:"primary_key;auto_increment;comment:员工唯一标识"`
 	Name       string    `gorm:"type:varchar(100);not null;comment:员工姓名"`
-	Role       string    `gorm:"type:enum('未分配', '管理员', '员工', '送餐员');default:'未分配';not null;comment:员工角色"`
+	Role       string    `gorm:"type:enum('未分配', '员工', '送餐员');default:'未分配';not null;comment:员工角色"`
 	Email      string    `gorm:"type:varchar(100);unique;not null;comment:员工邮箱"`
 	Phone      string    `gorm:"type:varchar(20);comment:员工电话"`
 	Password   string    `gorm:"type:varchar(255);not null;comment:员工密码"`

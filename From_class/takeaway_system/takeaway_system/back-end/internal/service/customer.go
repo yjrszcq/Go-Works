@@ -320,6 +320,40 @@ func (svc *CustomerService) EditCustomerByAdmin(ctx *gin.Context, id int64, name
 	return nil
 }
 
+func (svc *CustomerService) InitCustomerPassword(ctx *gin.Context, id int64, password string) error {
+	if sessions.Default(ctx).Get("role").(string) != "admin" {
+		return ErrUserHasNoPermissionInCustomer
+	}
+	if password == "" {
+		password = GlobalDefaultPassword
+	} else {
+		ok, err := svc.passwordExp.MatchString(password)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return ErrFormatForPasswordInCustomer
+		}
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	password = string(hash)
+	err = svc.repo.UpdateCustomerPassword(ctx, domain.Customer{
+		Id:       id,
+		Password: password,
+	})
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return ErrUserNotFoundInCustomer
+		} else {
+			return err
+		}
+	}
+	return nil
+}
+
 func (svc *CustomerService) GetAllCustomers(ctx *gin.Context) ([]domain.Customer, error) {
 	if sessions.Default(ctx).Get("role").(string) != "admin" {
 		return nil, ErrUserHasNoPermissionInCustomer

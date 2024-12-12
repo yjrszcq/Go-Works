@@ -55,7 +55,7 @@ func NewEmployeeService(repo *repository.EmployeeRepository) *EmployeeService {
 func getCurrentEmployeeId(ctx *gin.Context) (int64, error) {
 	sess := sessions.Default(ctx)
 	role := sess.Get("role").(string)
-	if role != "employee" && role != "admin" && role != "deliveryman" {
+	if role != "employee" && role != "deliveryman" {
 		return -1, ErrUserHasNoPermissionInEmployee
 	}
 	employeeId := sess.Get("id").(int64)
@@ -132,8 +132,6 @@ func (svc *EmployeeService) LogInEmployee(ctx *gin.Context, email string, passwo
 	// 设置 session
 	sess := sessions.Default(ctx)
 	switch employee.Role {
-	case "管理员":
-		sess.Set("role", "admin")
 	case "员工":
 		sess.Set("role", "employee")
 	case "送餐员":
@@ -303,7 +301,7 @@ func (svc *EmployeeService) EditEmployeeByAdmin(ctx *gin.Context, id int64, name
 	if !ok {
 		return ErrFormatForPhoneInEmployee
 	}
-	if role != "管理员" && role != "员工" && role != "送餐员" {
+	if role != "员工" && role != "送餐员" {
 		return ErrRoleInputInEmployee
 	}
 	if status != "可用" && status != "不可用" {
@@ -350,7 +348,7 @@ func (svc *EmployeeService) EditEmployeeRole(ctx *gin.Context, id int64, role st
 	if sessions.Default(ctx).Get("role").(string) != "admin" {
 		return ErrUserHasNoPermissionInEmployee
 	}
-	if role != "管理员" && role != "员工" && role != "送餐员" {
+	if role != "员工" && role != "送餐员" {
 		return ErrRoleInputInEmployee
 	}
 	err := svc.repo.UpdateEmployeeRole(ctx, domain.Employee{
@@ -391,6 +389,40 @@ func (svc *EmployeeService) EditEmployeeStatus(ctx *gin.Context, id int64, statu
 	})
 	if err != nil {
 		return err
+	}
+	return nil
+}
+
+func (svc *EmployeeService) InitEmployeePassword(ctx *gin.Context, id int64, password string) error {
+	if sessions.Default(ctx).Get("role").(string) != "admin" {
+		return ErrUserHasNoPermissionInEmployee
+	}
+	if password == "" {
+		password = GlobalDefaultPassword
+	} else {
+		ok, err := svc.passwordExp.MatchString(password)
+		if err != nil {
+			return err
+		}
+		if !ok {
+			return ErrFormatForPasswordInEmployee
+		}
+	}
+	hash, err := bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
+	if err != nil {
+		return err
+	}
+	password = string(hash)
+	err = svc.repo.UpdateEmployeePassword(ctx, domain.Employee{
+		Id:       id,
+		Password: password,
+	})
+	if err != nil {
+		if errors.Is(err, repository.ErrUserNotFound) {
+			return ErrUserNotFoundInEmployee
+		} else {
+			return err
+		}
 	}
 	return nil
 }

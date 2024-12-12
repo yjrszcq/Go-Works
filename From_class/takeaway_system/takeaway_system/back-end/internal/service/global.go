@@ -3,6 +3,8 @@ package service
 import "back-end/internal/repository"
 
 var (
+	GlobalDefaultPassword    string
+	GlobalAdmin              *AdminService
 	GlobalCustomer           *repository.CustomerRepository
 	GlobalEmployee           *repository.EmployeeRepository
 	GlobalDish               *repository.DishRepository
