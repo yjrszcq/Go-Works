@@ -106,6 +106,10 @@ func (svc *DishService) FindDishById(ctx *gin.Context, id int64) (domain.Dish, e
 			return domain.Dish{}, err
 		}
 	}
+	category, err := GlobalCategory.FindCategoryByID(ctx, d.CategoryID)
+	if err == nil {
+		d.CategoryName = category.Name
+	}
 	return d, nil
 }
 
@@ -120,6 +124,12 @@ func (svc *DishService) FindDishByName(ctx *gin.Context, name string) ([]domain.
 	}
 	if d == nil {
 		return nil, ErrRecordNotFoundInDish
+	}
+	for i := 0; i < len(d); i++ {
+		category, err := GlobalCategory.FindCategoryByID(ctx, d[i].CategoryID)
+		if err == nil {
+			d[i].CategoryName = category.Name
+		}
 	}
 	return d, nil
 }
@@ -136,6 +146,12 @@ func (svc *DishService) FindDishByCategory(ctx *gin.Context, categoryID int64) (
 	if d == nil {
 		return nil, ErrRecordIsEmptyInDish
 	}
+	for i := 0; i < len(d); i++ {
+		category, err := GlobalCategory.FindCategoryByID(ctx, d[i].CategoryID)
+		if err == nil {
+			d[i].CategoryName = category.Name
+		}
+	}
 	return d, nil
 }
 
@@ -150,6 +166,12 @@ func (svc *DishService) FindAllDishes(ctx *gin.Context) ([]domain.Dish, error) {
 	}
 	if d == nil {
 		return nil, ErrRecordIsEmptyInDish
+	}
+	for i := 0; i < len(d); i++ {
+		category, err := GlobalCategory.FindCategoryByID(ctx, d[i].CategoryID)
+		if err == nil {
+			d[i].CategoryName = category.Name
+		}
 	}
 	return d, nil
 }

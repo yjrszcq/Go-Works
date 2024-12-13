@@ -64,6 +64,10 @@ func (svc *CartItemService) FindCartItemByID(ctx *gin.Context, id int64) (domain
 	if customerId != c.CustomerID {
 		return domain.CartItem{}, ErrRecordNotFoundInCartItem
 	}
+	dish, err := GlobalDish.FindDishById(ctx, c.DishID)
+	if err == nil {
+		c.DishName = dish.Name
+	}
 	return c, nil
 }
 
@@ -81,6 +85,12 @@ func (svc *CartItemService) FindCartItemsByCustomerID(ctx *gin.Context) ([]domai
 	}
 	if c == nil {
 		return nil, ErrRecordIsEmptyInCartItem
+	}
+	for i := 0; i < len(c); i++ {
+		dish, err := GlobalDish.FindDishById(ctx, c[i].DishID)
+		if err == nil {
+			c[i].DishName = dish.Name
+		}
 	}
 	return c, nil
 }

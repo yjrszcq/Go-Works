@@ -31,20 +31,18 @@ func initDB(config *init_web.Config) *gorm.DB {
 	port := config.DbPort
 	Dbname := config.DbName
 	timeout := config.DbTimeout
-
 	//拼接下dsn参数, dsn格式可以参考上面的语法，这里使用Sprintf动态拼接dsn参数，因为一般数据库连接参数，我们都是保存在配置文件里面，需要从配置文件加载参数，然后拼接dsn。
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8&parseTime=True&loc=Local&timeout=%s", username, password, host, port, Dbname, timeout)
-
 	db, err := gorm.Open(mysql.Open(dsn))
 	if err != nil {
 		panic(err)
-
 	}
-
-	err = dao.InitTable(db)
-
-	if err != nil {
-		panic(err)
+	if config.DbInit {
+		// 自动创建表
+		err = dao.InitTable(db)
+		if err != nil {
+			panic(err)
+		}
 	}
 	return db
 }

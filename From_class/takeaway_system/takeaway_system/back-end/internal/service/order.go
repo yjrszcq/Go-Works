@@ -175,6 +175,13 @@ func (svc *OrderService) PayTheOrder(ctx *gin.Context, id int64) error {
 	for _, v := range orderItems {
 		err := GlobalCartItem.DeleteCartItemByCustomerIDAndDishID(ctx, customerId, v.DishID)
 		if err != nil {
+			err = svc.repo.UpdateOrderPaymentStatus(ctx, domain.Order{
+				Id:            id,
+				PaymentStatus: "待支付",
+			})
+			if err != nil {
+				return ErrUpdateOrderPaymentStatusInOrder
+			}
 			return ErrDeleteInvalidCartItemInOrder
 		}
 	}

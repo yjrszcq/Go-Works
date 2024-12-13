@@ -17,6 +17,7 @@ type Config struct {
 	DbPort     int
 	DbName     string
 	DbTimeout  string
+	DbInit     bool
 	// server
 	ServerPort string
 	// cors
@@ -39,6 +40,7 @@ func NewConfig() *Config { // 默认配置
 		DbPort:     3306,
 		DbName:     "test",
 		DbTimeout:  "10s",
+		DbInit:     false,
 		// server
 		ServerPort: "1000",
 		//cors
@@ -99,6 +101,7 @@ func writeDefaultConfig(config *Config) error {
 	secDatabase.Key("port").SetValue(fmt.Sprintf("%d", config.DbPort))
 	secDatabase.Key("name").SetValue(config.DbName)
 	secDatabase.Key("timeout").SetValue(config.DbTimeout)
+	secDatabase.Key("init").SetValue(fmt.Sprintf("%t", config.DbInit))
 
 	// 设置服务器配置
 	secServer := cfg.Section("server")
@@ -128,7 +131,7 @@ func writeDefaultConfig(config *Config) error {
 func isConfigComplete(cfg *ini.File) bool {
 	// 定义必需的配置结构
 	requiredConfig := map[string][]string{
-		"database": {"username", "password", "host", "port", "name", "timeout"},
+		"database": {"username", "password", "host", "port", "name", "timeout", "init"},
 		"server":   {"port"},
 		"cors":     {"allow_host"},
 		"cookie":   {"name"},
@@ -163,6 +166,7 @@ func readConfig(cfg *ini.File, defaultConfig *Config) *Config {
 	config.DbPort = dbSection.Key("port").MustInt(defaultConfig.DbPort)
 	config.DbName = dbSection.Key("name").MustString(defaultConfig.DbName)
 	config.DbTimeout = dbSection.Key("timeout").MustString(defaultConfig.DbTimeout)
+	config.DbInit = dbSection.Key("init").MustBool(defaultConfig.DbInit)
 
 	// 读取服务器配置
 	serverSection := cfg.Section("server")
