@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewOrderItemHandler(svc *service.OrderItemService) *OrderItemHandler {
 }
 
 func (o *OrderItemHandler) ErrOutputForOrderItem(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrOrderItemForeignKeyDishConstraintFail) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "失败, 菜品不存在"})
 	} else if errors.Is(err, service.ErrUserHasNoPermissionInOrderItem) {
@@ -47,6 +49,7 @@ func (o *OrderItemHandler) GetOrderItemById(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单项ID %d 查找成功", req.Id)
 	ctx.JSON(http.StatusOK, orderItem)
 }
 
@@ -64,6 +67,7 @@ func (o *OrderItemHandler) GetOrderItemsByOrderId(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 的订单项 查找成功", req.OrderId)
 	ctx.JSON(http.StatusOK, orderItems)
 }
 
@@ -82,6 +86,7 @@ func (o *OrderItemHandler) GetOrderItemsByDishId(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 的订单项 查找成功", req.DishId)
 	ctx.JSON(http.StatusOK, orderItems)
 }
 
@@ -99,6 +104,7 @@ func (o *OrderItemHandler) GetOrderItemsByReviewStatus(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单项状态 %s 的订单项 查找成功", req.Status)
 	ctx.JSON(http.StatusOK, orderItems)
 }
 
@@ -108,6 +114,7 @@ func (o *OrderItemHandler) GetAllOrderItemsByCustomer(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("用户的订单项 查找成功")
 	ctx.JSON(http.StatusOK, orderItems)
 }
 
@@ -117,6 +124,7 @@ func (o *OrderItemHandler) GetAllOrderItemsByEmployee(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("员工对 订单项 查找成功")
 	ctx.JSON(http.StatusOK, orderItems)
 }
 
@@ -134,5 +142,6 @@ func (o *OrderItemHandler) GetOrderItemsByDishIdByCustomer(ctx *gin.Context) {
 		o.ErrOutputForOrderItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 的订单项 查找成功", req.DishId)
 	ctx.JSON(http.StatusOK, orderItems)
 }

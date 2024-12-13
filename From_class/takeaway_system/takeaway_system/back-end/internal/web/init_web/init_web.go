@@ -1,9 +1,15 @@
 package init_web
 
 import (
+	"back-end/internal/web/web_log"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
+
+func InitWeb(db *gorm.DB, server *gin.Engine, cfg *Config) {
+	web_log.WebLogger = initLog(cfg)
+	RegisterRoutes(db, server, cfg)
+}
 
 func RegisterRoutes(db *gorm.DB, server *gin.Engine, cfg *Config) {
 	RegisterCustomerRoutes(db, server)

@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewReviewHandler(svc *service.ReviewService) *ReviewHandler {
 }
 
 func (r *ReviewHandler) ErrOutputForReview(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrRecordIsEmptyInReview) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无评价"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInReview) {
@@ -55,6 +57,7 @@ func (r *ReviewHandler) CreateReview(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单项ID %d 评价成功", req.OrderItemId)
 	ctx.JSON(http.StatusOK, gin.H{"message": "创建成功"})
 }
 
@@ -72,6 +75,7 @@ func (r *ReviewHandler) GetReviewById(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("评价ID %d 查询成功", req.Id)
 	ctx.JSON(http.StatusOK, review)
 }
 
@@ -89,6 +93,7 @@ func (r *ReviewHandler) GetReviewsByDishId(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 的评价列表 获取成功", req.DishId)
 	ctx.JSON(http.StatusOK, reviews)
 }
 
@@ -106,6 +111,7 @@ func (r *ReviewHandler) GetReviewsByRating(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("评分 %d 的评价列表 获取成功", req.Rating)
 	ctx.JSON(http.StatusOK, reviews)
 }
 
@@ -115,6 +121,7 @@ func (r *ReviewHandler) GetReviewsByCustomerId(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("用户的评价列表 获取成功")
 	ctx.JSON(http.StatusOK, reviews)
 }
 
@@ -134,6 +141,7 @@ func (r *ReviewHandler) EditReview(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("评价ID %d 更新成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -151,5 +159,6 @@ func (r *ReviewHandler) DeleteReview(ctx *gin.Context) {
 		r.ErrOutputForReview(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("评价ID %d 删除成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }

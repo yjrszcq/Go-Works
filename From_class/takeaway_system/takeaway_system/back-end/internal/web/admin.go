@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewAdminHandler(svc *service.AdminService) *AdminHandler {
 }
 
 func (a *AdminHandler) ErrOutputForAdmin(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrPasswordIsWrongInAdmin) {
 		ctx.JSON(http.StatusUnauthorized, gin.H{"message": "登录失败, 用户名或密码错误"})
 	} else {
@@ -40,6 +42,7 @@ func (a *AdminHandler) LogInAdmin(ctx *gin.Context) {
 		a.ErrOutputForAdmin(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员 %s 登录成功", req.Name)
 	ctx.JSON(http.StatusOK, gin.H{"message": "登录成功"})
 }
 
@@ -49,5 +52,6 @@ func (a *AdminHandler) LogOutAdmin(ctx *gin.Context) {
 		a.ErrOutputForAdmin(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("管理员登出成功")
 	ctx.JSON(http.StatusOK, gin.H{"message": "登出成功"})
 }

@@ -115,19 +115,19 @@ func (svc *EmployeeService) SignUpEmployee(ctx *gin.Context, name string, phone 
 	return nil
 }
 
-func (svc *EmployeeService) LogInEmployee(ctx *gin.Context, email string, password string) error {
+func (svc *EmployeeService) LogInEmployee(ctx *gin.Context, email string, password string) (domain.Employee, error) {
 	employee, err := svc.repo.FindEmployeeByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
-			return ErrInvalidUserOrPasswordInEmployee
+			return domain.Employee{}, ErrInvalidUserOrPasswordInEmployee
 		} else {
-			return err
+			return domain.Employee{}, err
 		}
 	}
 	err = bcrypt.CompareHashAndPassword([]byte(employee.Password), []byte(password))
 	if err != nil {
 		// DEBUG(打日志)
-		return ErrInvalidUserOrPasswordInEmployee
+		return domain.Employee{}, ErrInvalidUserOrPasswordInEmployee
 	}
 	// 设置 session
 	sess := sessions.Default(ctx)
@@ -148,9 +148,10 @@ func (svc *EmployeeService) LogInEmployee(ctx *gin.Context, email string, passwo
 	}
 	err = sess.Save()
 	if err != nil {
-		return err
+		return domain.Employee{}, err
 	}
-	return nil
+	employee.Password = ""
+	return employee, nil
 }
 
 func (svc *EmployeeService) EditEmployee(ctx *gin.Context, name string, phone string, email string) error {

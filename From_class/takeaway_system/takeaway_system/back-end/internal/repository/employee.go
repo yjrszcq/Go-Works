@@ -60,6 +60,7 @@ func (r *EmployeeRepository) FindEmployeeByEmail(ctx context.Context, email stri
 	}
 	return domain.Employee{
 		Id:       e.EmployeeID,
+		Name:     e.Name,
 		Email:    e.Email,
 		Password: e.Password,
 		Role:     e.Role,

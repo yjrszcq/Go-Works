@@ -64,6 +64,7 @@ func (r *CustomerRepository) FindCustomerByEmail(ctx context.Context, email stri
 	}
 	return domain.Customer{
 		Id:       c.CustomerID,
+		Name:     c.Name,
 		Email:    c.Email,
 		Password: c.Password,
 	}, nil

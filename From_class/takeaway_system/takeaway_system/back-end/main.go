@@ -19,7 +19,7 @@ func main() {
 	cfg := init_web.InitConfig()
 	db := initDB(cfg)
 	server := initWebServer(cfg)
-	init_web.RegisterRoutes(db, server, cfg)
+	init_web.InitWeb(db, server, cfg)
 	server.Run(":" + cfg.ServerPort)
 }
 

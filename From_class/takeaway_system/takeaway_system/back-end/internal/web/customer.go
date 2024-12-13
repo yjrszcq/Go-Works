@@ -2,7 +2,9 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
+	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -18,6 +20,7 @@ func NewCustomerHandler(svc *service.CustomerService) *CustomerHandler { // 预�
 }
 
 func (c *CustomerHandler) ErrOutputForCustomer(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrUserHasNoPermissionInCustomer) {
 		ctx.JSON(http.StatusForbidden, gin.H{"message": "失败, 无权限"})
 	} else if errors.Is(err, service.ErrUserDuplicateEmailInCustomer) {
@@ -61,6 +64,7 @@ func (c *CustomerHandler) SignUpCustomer(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("邮箱 %s 注册成功", req.Email)
 	ctx.JSON(http.StatusOK, gin.H{"message": "注册成功"}) // 响应
 }
 
@@ -75,12 +79,13 @@ func (c *CustomerHandler) LogInCustomer(ctx *gin.Context) {
 		ctx.JSON(http.StatusBadRequest, gin.H{"message": "登录失败, JSON字段不匹配"})
 		return
 	}
-	err := c.svc.LogInCustomer(ctx, req.Email, req.Password)
+	customer, err := c.svc.LogInCustomer(ctx, req.Email, req.Password)
 	if err != nil {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
-	ctx.JSON(http.StatusOK, gin.H{"message": "登录成功"}) // 响应
+	web_log.WebLogger.InfoLogger.Printf("用户ID %d 登录成功", sessions.Default(ctx).Get("id"))
+	ctx.JSON(http.StatusOK, customer) // 响应
 }
 
 func (c *CustomerHandler) EditCustomer(ctx *gin.Context) {
@@ -100,6 +105,7 @@ func (c *CustomerHandler) EditCustomer(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("用户ID %d 修改成功", sessions.Default(ctx).Get("id"))
 	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
 }
 
@@ -119,6 +125,7 @@ func (c *CustomerHandler) ChangeCustomerPassword(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("用户ID %d 修改密码成功", sessions.Default(ctx).Get("id"))
 	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
 }
 
@@ -128,6 +135,7 @@ func (c *CustomerHandler) ProfileCustomer(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("用户ID %d 获取个人信息成功", sessions.Default(ctx).Get("id"))
 	ctx.JSON(http.StatusOK, customer)
 }
 
@@ -137,6 +145,7 @@ func (c *CustomerHandler) LogOutCustomer(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("登出成功")
 	ctx.JSON(http.StatusOK, gin.H{"message": "登出成功"})
 }
 
@@ -159,6 +168,7 @@ func (c *CustomerHandler) EditCustomerByAdmin(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员对 用户ID %d 修改成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "修改成功"}) // 响应
 }
 
@@ -168,6 +178,7 @@ func (c *CustomerHandler) GetAllCustomers(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员获取用户列表成功")
 	ctx.JSON(http.StatusOK, customers)
 }
 
@@ -186,6 +197,7 @@ func (c *CustomerHandler) InitCustomerPassword(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员对 用户ID %d 初始化密码成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "初始化成功"})
 }
 
@@ -203,6 +215,7 @@ func (c *CustomerHandler) GetCustomerById(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员对 用户ID %d 查询成功", req.Id)
 	ctx.JSON(http.StatusOK, customer)
 }
 
@@ -220,6 +233,7 @@ func (c *CustomerHandler) GetCustomerByName(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员对 用户 %s 查询成功", req.Name)
 	ctx.JSON(http.StatusOK, customers)
 }
 
@@ -237,5 +251,6 @@ func (c *CustomerHandler) DeleteCustomer(ctx *gin.Context) {
 		c.ErrOutputForCustomer(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("管理员对 用户ID %d 删除成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }

@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewCartItemHandler(svc *service.CartItemService) *CartItemHandler {
 }
 
 func (c *CartItemHandler) ErrOutputForCartItem(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrRecordIsEmptyInCartItem) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 购物车为空"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInCartItem) {
@@ -48,6 +50,7 @@ func (c *CartItemHandler) AddCartItem(ctx *gin.Context) {
 		c.ErrOutputForCartItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 添加到购物车成功", req.DishID)
 	ctx.JSON(http.StatusOK, gin.H{"message": "添加成功"})
 }
 
@@ -57,6 +60,7 @@ func (c *CartItemHandler) GetCartItemsByCustomerId(ctx *gin.Context) {
 		c.ErrOutputForCartItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("购物车项列表 获取成功")
 	ctx.JSON(http.StatusOK, cartItems)
 }
 
@@ -74,6 +78,7 @@ func (c *CartItemHandler) GetCartItemById(ctx *gin.Context) {
 		c.ErrOutputForCartItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("购物车项ID %d 获取成功", req.CartItemID)
 	ctx.JSON(http.StatusOK, cartItem)
 }
 
@@ -92,6 +97,7 @@ func (c *CartItemHandler) EditCartItem(ctx *gin.Context) {
 		c.ErrOutputForCartItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("购物车项ID %d 更新成功", req.CartItemID)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -109,6 +115,7 @@ func (c *CartItemHandler) DeleteCartItem(ctx *gin.Context) {
 		c.ErrOutputForCartItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("购物车项ID %d 删除成功", req.CartItemID)
 	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }
 
@@ -118,5 +125,6 @@ func (c *CartItemHandler) DeleteCartItemsByCustomerId(ctx *gin.Context) {
 		c.ErrOutputForCartItem(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("购物车项列表 删除成功")
 	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }

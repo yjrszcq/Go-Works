@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewOrderStatusHistoryHandler(svc *service.OrderStatusHistoryService) *Order
 }
 
 func (o *OrderStatusHistoryHandler) ErrOutputForOrderStatusHistory(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrRecordIsEmptyInOrderStatusHistory) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无订单状态历史记录"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInOrderStatusHistory) {
@@ -45,6 +47,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoryByID(ctx *gin.Context)
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单状态历史记录ID %d 查找成功", req.Id)
 	ctx.JSON(http.StatusOK, history)
 }
 
@@ -62,6 +65,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByOrderID(ctx *gin.C
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 的订单状态历史记录 查找成功", req.OrderId)
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -71,6 +75,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesAllByCustomer(ctx *g
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单状态历史记录 查找成功")
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -88,6 +93,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByStatusByCustomer(c
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("%s 订单状态历史记录 查找成功", req.Status)
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -105,6 +111,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByChangedByIDByCusto
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("由 %d 操作的 订单状态历史记录 查找成功", req.ChangedById)
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -114,6 +121,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesAllByEmployee(ctx *g
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单状态历史记录 查找成功")
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -131,6 +139,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByStatusByEmployee(c
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("%s 订单状态历史记录 查找成功", req.Status)
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -148,6 +157,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByChangedByIDByEmplo
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("由 %d 操作的订单状态历史记录 查找成功", req.ChangedById)
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -166,6 +176,7 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByOrderIDAndStatus(c
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 的 %s 订单状态历史记录 查找成功", req.OrderId, req.Status)
 	ctx.JSON(http.StatusOK, histories)
 }
 
@@ -184,5 +195,6 @@ func (o *OrderStatusHistoryHandler) FindOrderStatusHistoriesByOrderIDAndChangedB
 		o.ErrOutputForOrderStatusHistory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 由 %d 操作的订单状态历史记录 查找成功", req.OrderId, req.ChangedById)
 	ctx.JSON(http.StatusOK, histories)
 }

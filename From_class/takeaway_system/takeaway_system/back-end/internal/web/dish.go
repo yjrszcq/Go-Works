@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewDishHandler(svc *service.DishService) *DishHandler {
 }
 
 func (d *DishHandler) ErrOutputForDish(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrRecordIsEmptyInDish) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无菜品"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInDish) {
@@ -57,6 +59,7 @@ func (d *DishHandler) CreateDish(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品 %s 创建成功", req.Name)
 	ctx.JSON(http.StatusOK, gin.H{"message": "创建成功"})
 }
 
@@ -74,6 +77,7 @@ func (d *DishHandler) GetDishById(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 查询成功", req.Id)
 	ctx.JSON(http.StatusOK, dish)
 }
 
@@ -91,6 +95,7 @@ func (d *DishHandler) GetDishByName(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品 %s 查询成功", req.Name)
 	ctx.JSON(http.StatusOK, dishes)
 }
 
@@ -108,6 +113,7 @@ func (d *DishHandler) GetDishByCategory(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("分类ID %d 菜品列表查询成功", req.CategoryID)
 	ctx.JSON(http.StatusOK, dishes)
 }
 
@@ -117,6 +123,7 @@ func (d *DishHandler) GetAllDishes(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("菜品列表查询成功")
 	ctx.JSON(http.StatusOK, dishes)
 }
 
@@ -139,6 +146,7 @@ func (d *DishHandler) EditDish(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 编辑成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "编辑成功"})
 }
 
@@ -156,5 +164,6 @@ func (d *DishHandler) DeleteDish(ctx *gin.Context) {
 		d.ErrOutputForDish(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("菜品ID %d 删除成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }

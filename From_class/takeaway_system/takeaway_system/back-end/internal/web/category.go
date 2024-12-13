@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewCategoryHandler(svc *service.CategoryService) *CategoryHandler {
 }
 
 func (c *CategoryHandler) ErrOutputForCategory(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrRecordIsEmptyInCategory) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无分类"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInCategory) {
@@ -50,6 +52,7 @@ func (c *CategoryHandler) CreateCategory(ctx *gin.Context) {
 		c.ErrOutputForCategory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("分类 %s 创建成功", req.Name)
 	ctx.JSON(http.StatusOK, gin.H{"message": "创建成功"})
 }
 
@@ -67,6 +70,7 @@ func (c *CategoryHandler) GetCategoryById(ctx *gin.Context) {
 		c.ErrOutputForCategory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("分类ID %d 查询成功", req.Id)
 	ctx.JSON(http.StatusOK, category)
 }
 
@@ -84,6 +88,7 @@ func (c *CategoryHandler) GetCategoryByName(ctx *gin.Context) {
 		c.ErrOutputForCategory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("分类 %s 查询成功", req.Name)
 	ctx.JSON(http.StatusOK, category)
 }
 
@@ -93,6 +98,7 @@ func (c *CategoryHandler) GetAllCategories(ctx *gin.Context) {
 		c.ErrOutputForCategory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("分类列表 查询成功")
 	ctx.JSON(http.StatusOK, categories)
 }
 
@@ -112,6 +118,7 @@ func (c *CategoryHandler) EditCategory(ctx *gin.Context) {
 		c.ErrOutputForCategory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("分类ID %d 更新成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -129,5 +136,6 @@ func (c *CategoryHandler) DeleteCategory(ctx *gin.Context) {
 		c.ErrOutputForCategory(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("分类ID %d 删除成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "删除成功"})
 }

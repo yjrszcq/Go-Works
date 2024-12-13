@@ -2,6 +2,7 @@ package web
 
 import (
 	"back-end/internal/service"
+	"back-end/internal/web/web_log"
 	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
@@ -18,6 +19,7 @@ func NewOrderHandler(svc *service.OrderService) *OrderHandler {
 }
 
 func (o *OrderHandler) ErrOutputForOrder(ctx *gin.Context, err error) {
+	web_log.WebLogger.ErrorLogger.Println(err)
 	if errors.Is(err, service.ErrRecordIsEmptyInOrder) {
 		ctx.JSON(http.StatusOK, gin.H{"message": "成功, 暂无订单"})
 	} else if errors.Is(err, service.ErrRecordNotFoundInOrder) {
@@ -91,6 +93,7 @@ func (o *OrderHandler) CreateOrder(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 创建成功", order.Id)
 	ctx.JSON(http.StatusOK, order)
 }
 
@@ -108,6 +111,7 @@ func (o *OrderHandler) PayTheOrder(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 支付成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "支付成功"})
 }
 
@@ -125,6 +129,7 @@ func (o *OrderHandler) GetOrderById(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 查询成功", req.Id)
 	ctx.JSON(http.StatusOK, order)
 }
 
@@ -134,6 +139,7 @@ func (o *OrderHandler) GetOrdersByCustomerId(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("订单列表 查询成功")
 	ctx.JSON(http.StatusOK, orders)
 }
 
@@ -151,6 +157,7 @@ func (o *OrderHandler) GetOrdersByCustomerIdByEmployee(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("用户ID %d 订单列表 查询成功", req.CustomerId)
 	ctx.JSON(http.StatusOK, orders)
 }
 
@@ -168,6 +175,7 @@ func (o *OrderHandler) GetOrdersByDeliveryPersonId(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("由送餐员ID %d 送餐的订单列表 查询成功", req.DeliverymanId)
 	ctx.JSON(http.StatusOK, orders)
 }
 
@@ -185,6 +193,7 @@ func (o *OrderHandler) GetOrdersByStatus(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("%s 订单列表 查询成功", req.Status)
 	ctx.JSON(http.StatusOK, orders)
 }
 
@@ -202,6 +211,7 @@ func (o *OrderHandler) GetOrdersByPaymentStatus(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("%s 订单列表 查询成功", req.PaymentStatus)
 	ctx.JSON(http.StatusOK, orders)
 }
 
@@ -211,6 +221,7 @@ func (o *OrderHandler) EmployeeGetOrders(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("员工对 订单列表 查询成功")
 	ctx.JSON(http.StatusOK, order)
 }
 
@@ -220,6 +231,7 @@ func (o *OrderHandler) DeliverymanGetOrdersWaitingForDelivery(ctx *gin.Context) 
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("送餐员对 待接订单列表 查询成功")
 	ctx.JSON(http.StatusOK, order)
 }
 
@@ -229,6 +241,7 @@ func (o *OrderHandler) DeliverymanGetOrdersDelivering(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("送餐员对 送餐中订单列表 查询成功")
 	ctx.JSON(http.StatusOK, order)
 }
 
@@ -238,6 +251,7 @@ func (o *OrderHandler) DeliverymanGetOrdersDelivered(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Println("送餐员对 已送达订单列表 查询成功")
 	ctx.JSON(http.StatusOK, order)
 }
 
@@ -255,6 +269,7 @@ func (o *OrderHandler) ConfirmTheOrder(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 已确认", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -272,6 +287,7 @@ func (o *OrderHandler) MealPreparationCompleted(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 已出餐", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -289,6 +305,7 @@ func (o *OrderHandler) DeliverTheFood(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 送餐中", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -306,6 +323,7 @@ func (o *OrderHandler) FoodDelivered(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 已送达", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "更新成功"})
 }
 
@@ -323,6 +341,7 @@ func (o *OrderHandler) CancelTheOrder(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 取消成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "订单取消成功"})
 }
 
@@ -340,6 +359,7 @@ func (o *OrderHandler) DeleteTheOrder(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("订单ID %d 删除成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "订单删除成功"})
 }
 
@@ -357,5 +377,6 @@ func (o *OrderHandler) CancelTheOrderByEmployee(ctx *gin.Context) {
 		o.ErrOutputForOrder(ctx, err)
 		return
 	}
+	web_log.WebLogger.InfoLogger.Printf("员工对 订单ID %d 取消成功", req.Id)
 	ctx.JSON(http.StatusOK, gin.H{"message": "订单取消成功"})
 }

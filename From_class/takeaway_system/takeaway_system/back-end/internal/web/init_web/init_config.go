@@ -24,6 +24,8 @@ type Config struct {
 	AllowHost string
 	// cookie
 	CookieName string
+	// log
+	LogFile string
 	// admin
 	AdminUsername string
 	AdminPassword string
@@ -47,6 +49,8 @@ func NewConfig() *Config { // 默认配置
 		AllowHost: "example.com",
 		// cookie
 		CookieName: "sid",
+		// log
+		LogFile: "gin.log",
 		// admin
 		AdminUsername: "admin",
 		AdminPassword: "123456",
@@ -115,6 +119,10 @@ func writeDefaultConfig(config *Config) error {
 	secCookie := cfg.Section("cookie")
 	secCookie.Key("name").SetValue(config.CookieName)
 
+	// 设置日志配置
+	secLog := cfg.Section("log")
+	secLog.Key("file").SetValue(config.LogFile)
+
 	// 设置管理员配置
 	secAdmin := cfg.Section("admin")
 	secAdmin.Key("username").SetValue(config.AdminUsername)
@@ -135,6 +143,7 @@ func isConfigComplete(cfg *ini.File) bool {
 		"server":   {"port"},
 		"cors":     {"allow_host"},
 		"cookie":   {"name"},
+		"log":      {"file"},
 		"admin":    {"username", "password"},
 		"other":    {"default_password"},
 	}
@@ -179,6 +188,10 @@ func readConfig(cfg *ini.File, defaultConfig *Config) *Config {
 	// 读取cookie配置
 	cookieSection := cfg.Section("cookie")
 	config.CookieName = cookieSection.Key("name").MustString(defaultConfig.CookieName)
+
+	// 读取日志配置
+	logSection := cfg.Section("log")
+	config.LogFile = logSection.Key("file").MustString(defaultConfig.LogFile)
 
 	// 读取管理员配置
 	adminSection := cfg.Section("admin")

@@ -111,21 +111,21 @@ func (svc *CustomerService) SignUpCustomer(ctx *gin.Context, email string, passw
 	return nil
 }
 
-func (svc *CustomerService) LogInCustomer(ctx *gin.Context, email string, password string) error {
+func (svc *CustomerService) LogInCustomer(ctx *gin.Context, email string, password string) (domain.Customer, error) {
 	// 先找用户
 	customer, err := svc.repo.FindCustomerByEmail(ctx, email)
 	if err != nil {
 		if errors.Is(err, repository.ErrUserNotFound) {
-			return ErrInvalidUserOrPasswordInCustomer
+			return domain.Customer{}, ErrInvalidUserOrPasswordInCustomer
 		} else {
-			return err
+			return domain.Customer{}, err
 		}
 	}
 	// 比较密码
 	err = bcrypt.CompareHashAndPassword([]byte(customer.Password), []byte(password))
 	if err != nil {
 		// DEBUG(打日志)
-		return ErrInvalidUserOrPasswordInCustomer
+		return domain.Customer{}, ErrInvalidUserOrPasswordInCustomer
 	}
 	// 设置 session
 	sess := sessions.Default(ctx)
@@ -134,9 +134,10 @@ func (svc *CustomerService) LogInCustomer(ctx *gin.Context, email string, passwo
 	sess.Set("status", "available")
 	err = sess.Save()
 	if err != nil {
-		return err
+		return domain.Customer{}, err
 	}
-	return nil
+	customer.Password = ""
+	return customer, nil
 }
 
 func (svc *CustomerService) EditCustomer(ctx *gin.Context, name string, email string, phone string, address string) error {
