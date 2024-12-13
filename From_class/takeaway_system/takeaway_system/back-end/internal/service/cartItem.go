@@ -33,19 +33,32 @@ func (svc *CartItemService) AddCartItem(ctx *gin.Context, dishID int64, quantity
 	if quantity <= 0 || quantity > 99 {
 		return ErrFormatForQuantityInCartItem
 	}
-	err = svc.repo.CreateCartItem(ctx, domain.CartItem{
-		CustomerID: id,
-		DishID:     dishID,
-		Quantity:   quantity,
-	})
+	cartItem, err := svc.repo.FindCartItemByCustomerIDAndDishID(ctx, id, dishID)
 	if err != nil {
-		if errors.Is(err, repository.ErrCartItemForeignKeyDishConstraintFail) {
-			return ErrDishInCartNotFoundInCartItem
+		if errors.Is(err, repository.ErrCartItemNotFound) {
+			err = svc.repo.CreateCartItem(ctx, domain.CartItem{
+				CustomerID: id,
+				DishID:     dishID,
+				Quantity:   quantity,
+			})
+			if err != nil {
+				if errors.Is(err, repository.ErrCartItemForeignKeyDishConstraintFail) {
+					return ErrDishInCartNotFoundInCartItem
+				} else {
+					return err
+				}
+			}
+			return nil
 		} else {
 			return err
 		}
+	} else {
+		err = svc.repo.UpdateCartItemQuantity(ctx, domain.CartItem{
+			Id:       cartItem.Id,
+			Quantity: quantity + cartItem.Quantity,
+		})
+		return nil
 	}
-	return nil
 }
 
 func (svc *CartItemService) FindCartItemByID(ctx *gin.Context, id int64) (domain.CartItem, error) {
