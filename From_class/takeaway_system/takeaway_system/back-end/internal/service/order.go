@@ -407,6 +407,40 @@ func (svc *OrderService) EmployeeGetOrders(ctx *gin.Context) ([]domain.Order, er
 	return orders, nil
 }
 
+func (svc *OrderService) DeliverymanGetOrders(ctx *gin.Context) ([]domain.Order, error) {
+	if sessions.Default(ctx).Get("role") != "deliveryman" {
+		return nil, ErrUserHasNoPermissionInOrder
+	}
+	ordersWaitingForDelivery, err := svc.repo.FindOrdersByStatus(ctx, "待送餐")
+	employeeId, _ := getCurrentEmployeeId(ctx)
+	ordersDeliveringTemp, err := svc.repo.FindOrdersByStatus(ctx, "送餐中")
+	ordersDelivering := make([]domain.Order, 0)
+	for _, v := range ordersDeliveringTemp {
+		if v.DeliveryPersonID == employeeId {
+			ordersDelivering = append(ordersDelivering, v)
+		}
+	}
+	ordersDeliveredTemp, err := svc.repo.FindOrdersByStatus(ctx, "已送达")
+	ordersDelivered := make([]domain.Order, 0)
+	for _, v := range ordersDeliveredTemp {
+		if v.DeliveryPersonID == employeeId {
+			ordersDelivered = append(ordersDelivered, v)
+		}
+	}
+	orders := append(ordersWaitingForDelivery, ordersDelivering...)
+	orders = append(orders, ordersDelivered...)
+	if err != nil {
+		if errors.Is(err, repository.ErrOrderNotFound) {
+			return nil, ErrDeliverymanHasNotOrderCanTake
+		} else {
+			return nil, err
+		}
+	}
+	if orders == nil {
+		return nil, ErrDeliverymanHasNotOrderCanTake
+	}
+	return orders, nil
+}
 func (svc *OrderService) DeliverymanGetOrdersWaitingForDelivery(ctx *gin.Context) ([]domain.Order, error) {
 	if sessions.Default(ctx).Get("role") != "deliveryman" {
 		return nil, ErrUserHasNoPermissionInOrder

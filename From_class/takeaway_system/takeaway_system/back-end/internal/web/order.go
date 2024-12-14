@@ -225,6 +225,16 @@ func (o *OrderHandler) EmployeeGetOrders(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, order)
 }
 
+func (o *OrderHandler) DeliverymanGetOrders(ctx *gin.Context) {
+	order, err := o.svc.DeliverymanGetOrders(ctx)
+	if err != nil {
+		o.ErrOutputForOrder(ctx, err)
+		return
+	}
+	web_log.WebLogger.InfoLogger.Println("送餐员对 订单列表 查询成功")
+	ctx.JSON(http.StatusOK, order)
+}
+
 func (o *OrderHandler) DeliverymanGetOrdersWaitingForDelivery(ctx *gin.Context) {
 	order, err := o.svc.DeliverymanGetOrdersWaitingForDelivery(ctx)
 	if err != nil {

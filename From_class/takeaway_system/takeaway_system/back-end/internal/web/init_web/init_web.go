@@ -127,6 +127,7 @@ func RegisterOrderRoutes(db *gorm.DB, server *gin.Engine) {
 	oge.POST("/confirm", o.ConfirmTheOrder)
 	oge.POST("/complete", o.MealPreparationCompleted)
 	ogd := server.Group("/deliveryman/order")
+	ogd.GET("/list", o.DeliverymanGetOrders)
 	ogd.GET("/find/waiting_for_delivery", o.DeliverymanGetOrdersWaitingForDelivery)
 	ogd.GET("/find/delivering", o.DeliverymanGetOrdersDelivering)
 	ogd.GET("/find/delivered", o.DeliverymanGetOrdersDelivered)

@@ -762,15 +762,19 @@ $(document).ready(function() {
                         <strong>订单总额:</strong> ${order.TotalAmount}<br>
                         <strong>订单日期:</strong> ${order.OrderDate}<br>
                         <strong>配送时间:</strong> ${order.DeliveryTime}<br>
+                        <strong>配送人员姓名:</strong> ${order.DeliveryPersonName}<br>
                         <strong>配送人员ID:</strong> ${order.DeliveryPersonID}<br>
                         <strong>创建时间:</strong> ${order.CreatedAt}<br>
-                         <strong>如果订单已送达，即可评价:</strong><br>
+                        <div>
+                        <strong>如果订单已送达，即可评价:</strong> 
                         <button type="button" id="back-to-orders" class="button-container">返回订单列表</button>
-                        ${order.Status === '待支付' ? '<button type="button" id="confirm-payment" class="button-container">确认支付</button>' : ''}
-                        
+                        <br>
+                        <div>
+                        <strong>如果订单待支付，即可支付:</strong> 
+                        <button type="button" id="detail-confirm-payment" class="button-container">确认支付</button>
                     </div>      
         `
-       
+
         fetchOrderItems(order.Id,order.Status);
         $('#details-order-items').append(orderDetailsSection);
     
@@ -780,6 +784,33 @@ $(document).ready(function() {
             // 显示当前激活的内容部分
             $('#orders-nav').click();
            // 创建新界面
+        });
+
+        $('#detail-confirm-payment').on('click', function(e) {
+            e.preventDefault();
+            let orderId = parseInt(order.Id)
+            if (order.Id) {
+                $.ajax({
+                    url: 'http://127.0.0.1:1000/order/pay',
+                    type: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ id: orderId }),
+                    xhrFields: {
+                        withCredentials: true
+                    },
+                    success: function(response) {
+                        alert('支付成功');
+                        $('.content-section').hide();
+                        // 显示当前激活的内容部分
+                        $('#orders-nav').click();
+                    },
+                    error: function(error) {
+                        alert('支付失败: ' + error.responseText);
+                    }
+                });
+            } else {
+                alert('订单ID未找到');
+            }
         });
     }
 
@@ -1970,7 +2001,7 @@ $(document).ready(function() {
     
     function loadOrders() {
         $.ajax({
-            url: 'http://127.0.0.1:1000/deliveryman/order/find/waiting_for_delivery',
+            url: 'http://127.0.0.1:1000/deliveryman/order/list',
             method: 'GET',
             xhrFields: {
                 withCredentials: true // 带上 cookie
@@ -2021,8 +2052,8 @@ $(document).ready(function() {
                             <p>预计配送时间：${order.DeliveryTime}</p>
                         </div>
                         <div class="order-actions">
-                            <button class="deliver-order">出餐</button>
-                            <button class="delivered-order">已送达</button>
+                            <button class="deliver-order">送餐</button>
+                            <button class="delivered-order">送达</button>
                         </div>
                     </div>
                 `;
@@ -2072,4 +2103,3 @@ $(document).ready(function() {
     }
 
 });
-
