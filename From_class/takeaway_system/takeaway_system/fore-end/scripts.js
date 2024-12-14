@@ -764,7 +764,7 @@ $(document).ready(function() {
                         <strong>配送时间:</strong> ${order.DeliveryTime}<br>
                         <strong>配送人员ID:</strong> ${order.DeliveryPersonID}<br>
                         <strong>创建时间:</strong> ${order.CreatedAt}<br>
-                         <strong>如果订单已送达，即可评价:</strong> ${order.CreatedAt}<br>
+                         <strong>如果订单已送达，即可评价:</strong><br>
                         <button type="button" id="back-to-orders" class="button-container">返回订单列表</button>
                         ${order.Status === '待支付' ? '<button type="button" id="confirm-payment" class="button-container">确认支付</button>' : ''}
                         
@@ -1087,13 +1087,13 @@ $(document).ready(function() {
     }
 
    function hideOtherSection(){
-        $("#orders").hide();
-        $("#reviews").hide();
+        $("#orders-nav").hide();
+        $("#reviews-nav").hide();
    }
 
    function showOtherSection(){
-        $("#orders").show();
-        $("#reviews").show();
+        $("#orders-nav").show();
+        $("#reviews-nav").show();
     }
 
     // 取消登录功能
@@ -1943,9 +1943,6 @@ $(document).ready(function() {
         var html = '';
         orders.forEach(function(order) {
              // 检查 data 是否为对象，如果是，则将其转换为数组
-             if (order && typeof order === 'object' && !Array.isArray(order)) {
-                order = [order];
-            }
             html += `
                 <li class="order-item">
                     <div class="details">

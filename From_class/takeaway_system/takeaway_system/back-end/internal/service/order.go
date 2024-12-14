@@ -164,6 +164,9 @@ func (svc *OrderService) PayTheOrder(ctx *gin.Context, id int64) error {
 	if order.PaymentStatus != "待支付" {
 		return ErrOrderStatusErrorInOrder
 	}
+	if order.Status != "确认中" {
+		return ErrOrderStatusErrorInOrder
+	}
 	err = svc.repo.UpdateOrderPaymentStatus(ctx, domain.Order{
 		Id:            id,
 		PaymentStatus: "已支付",
