@@ -210,6 +210,12 @@ func (svc *OrderService) GetOrderById(ctx *gin.Context, id int64) (domain.Order,
 			return domain.Order{}, ErrRecordNotFoundInOrder
 		}
 	}
+	if order.DeliveryPersonID != 0 {
+		employee, err := GlobalEmployee.FindEmployeeById(ctx, order.DeliveryPersonID)
+		if err == nil {
+			order.DeliveryPersonName = employee.Name
+		}
+	}
 	return order, nil
 }
 
@@ -228,6 +234,14 @@ func (svc *OrderService) GetOrdersByCustomerId(ctx *gin.Context) ([]domain.Order
 	}
 	if orders == nil {
 		return nil, ErrRecordIsEmptyInOrder
+	}
+	for i := 0; i < len(orders); i++ {
+		if orders[i].DeliveryPersonID != 0 {
+			employee, err := GlobalEmployee.FindEmployeeById(ctx, orders[i].DeliveryPersonID)
+			if err == nil {
+				orders[i].DeliveryPersonName = employee.Name
+			}
+		}
 	}
 	return orders, nil
 }
@@ -248,6 +262,14 @@ func (svc *OrderService) GetOrdersByCustomerIdByEmployee(ctx *gin.Context, custo
 	if orders == nil {
 		return nil, ErrRecordIsEmptyInOrder
 	}
+	for i := 0; i < len(orders); i++ {
+		if orders[i].DeliveryPersonID != 0 {
+			employee, err := GlobalEmployee.FindEmployeeById(ctx, orders[i].DeliveryPersonID)
+			if err == nil {
+				orders[i].DeliveryPersonName = employee.Name
+			}
+		}
+	}
 	return orders, nil
 }
 
@@ -266,6 +288,14 @@ func (svc *OrderService) GetOrdersByDeliveryPersonId(ctx *gin.Context, deliverym
 	}
 	if orders == nil {
 		return nil, ErrRecordIsEmptyInOrder
+	}
+	for i := 0; i < len(orders); i++ {
+		if orders[i].DeliveryPersonID != 0 {
+			employee, err := GlobalEmployee.FindEmployeeById(ctx, orders[i].DeliveryPersonID)
+			if err == nil {
+				orders[i].DeliveryPersonName = employee.Name
+			}
+		}
 	}
 	return orders, nil
 }
@@ -298,6 +328,14 @@ func (svc *OrderService) GetOrdersByStatus(ctx *gin.Context, status string) ([]d
 	if orders == nil {
 		return nil, ErrRecordIsEmptyInOrder
 	}
+	for i := 0; i < len(orders); i++ {
+		if orders[i].DeliveryPersonID != 0 {
+			employee, err := GlobalEmployee.FindEmployeeById(ctx, orders[i].DeliveryPersonID)
+			if err == nil {
+				orders[i].DeliveryPersonName = employee.Name
+			}
+		}
+	}
 	return orders, nil
 }
 
@@ -329,6 +367,14 @@ func (svc *OrderService) GetOrdersByPaymentStatus(ctx *gin.Context, paymentStatu
 	if orders == nil {
 		return nil, ErrRecordIsEmptyInOrder
 	}
+	for i := 0; i < len(orders); i++ {
+		if orders[i].DeliveryPersonID != 0 {
+			employee, err := GlobalEmployee.FindEmployeeById(ctx, orders[i].DeliveryPersonID)
+			if err == nil {
+				orders[i].DeliveryPersonName = employee.Name
+			}
+		}
+	}
 	return orders, nil
 }
 
@@ -346,6 +392,14 @@ func (svc *OrderService) EmployeeGetOrders(ctx *gin.Context) ([]domain.Order, er
 	}
 	if orders == nil {
 		return nil, ErrEmployeeHasNotOrderCanTake
+	}
+	for i := 0; i < len(orders); i++ {
+		if orders[i].DeliveryPersonID != 0 {
+			employee, err := GlobalEmployee.FindEmployeeById(ctx, orders[i].DeliveryPersonID)
+			if err == nil {
+				orders[i].DeliveryPersonName = employee.Name
+			}
+		}
 	}
 	return orders, nil
 }
@@ -384,9 +438,14 @@ func (svc *OrderService) DeliverymanGetOrdersDelivering(ctx *gin.Context) ([]dom
 		return nil, ErrDeliverymanHasNotDeliveringOrder
 	}
 	employeeId, _ := getCurrentEmployeeId(ctx)
+	e, err := GlobalEmployee.FindEmployeeById(ctx, employeeId)
+	if err != nil {
+		return nil, err
+	}
 	deliverymanOrders := make([]domain.Order, 0)
 	for _, v := range orders {
 		if v.DeliveryPersonID == employeeId {
+			v.DeliveryPersonName = e.Name
 			deliverymanOrders = append(deliverymanOrders, v)
 		}
 	}
@@ -412,9 +471,14 @@ func (svc *OrderService) DeliverymanGetOrdersDelivered(ctx *gin.Context) ([]doma
 		return nil, ErrDeliverymanHasNotDeliveredOrder
 	}
 	employeeId, _ := getCurrentEmployeeId(ctx)
+	e, err := GlobalEmployee.FindEmployeeById(ctx, employeeId)
+	if err != nil {
+		return nil, err
+	}
 	deliverymanOrders := make([]domain.Order, 0)
 	for _, v := range orders {
 		if v.DeliveryPersonID == employeeId {
+			v.DeliveryPersonName = e.Name
 			deliverymanOrders = append(deliverymanOrders, v)
 		}
 	}

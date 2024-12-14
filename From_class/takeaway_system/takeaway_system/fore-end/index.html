@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>企业内部订餐系统</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav>
+            <ul>
+
+                <li><a href="#" id="menu-nav">菜单</a></li>
+                <li><a href="#" id="cart-nav">购物车</a></li>
+                <li><a href="#" id="employee-nav">管理界面</a></li> 
+                <li><a href="#" id="deliveryman-nav">员工界面</a></li> 
+                <li><a href="#" id="my-nav">我的</a></li>
+                <li><a href="#" id="login-nav">登录</a></li>
+                <li><a href="#" id="admin-nav">管理员</a></li>
+                
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section id="menu-section" class="page" style="display: none;">
+            <h1>菜单</h1>
+            <div id="search-box">
+                <input type="text" id="dish-name" placeholder="请输入菜品名字">
+                <button id="search-button">搜索</button>
+            </div>
+            <div id="menu-items">
+                <!-- 动态生成的菜单项 -->
+                
+            </div>
+        </section>
+
+        <section id="dishdetail-section" class="page" style="display: none;">
+            <div class="dish-detail">
+                <img id="dish-image" src="" alt="菜品图片">
+                <div class="dish-detail-info">
+                    <label>
+                        菜品的ID：
+                    </label>
+                    <p class="dish-id" id="dish-detail-id">
+
+                    </p>
+                    <p class="dish-name" id="dish-detail-name">
+
+                    </p>
+                    <p class="dish-category" id="dish-detail-category">
+
+                    </p>
+                    <p class="dish-description" id="dish-detail-description">
+
+                    </p>
+                    <p class="dish-price" id="dish-detail-price">
+                        
+                    </p>
+                    <div class="forCss">
+                        <label for="quantity">数量:</label>
+                        <input type="number" id="quantity" min="1" max="10" value="1">
+                    </div>
+                    <div class="dish-reviews" id="dish-reviews">
+                        <!--评论在这添加-->
+                    </div>
+                </div>
+                <div class="dish-actions">
+                    <button id="add-to-cart">加入购物车</button>
+                    <button id="back-to-menu">返回上一级餐单</button>
+                </div>
+            </div>
+        </section>
+
+        
+        <section id="cart-section" class="page" style="display: none;">
+            <h1>购物车</h1>
+            <div id="cart-items">
+                <!-- 购物车项将在这里动态生成 -->                
+            </div>
+            <div class="cartform-group">
+                <label for="delivery-location">配送地址:</label>
+                <input type="text" id="delivery-location" placeholder="默认为用户地址">
+            </div>
+            <div class="cartform-group">
+                <label for="delivery-time">配送时间:</label>
+                <input type="datetime-local" id="delivery-time">
+            </div>
+            <div class="button-container">
+                <button id="clear-cart">清除全部购物车</button>
+                <button id="confirm-payment">确认支付</button>
+            </div>
+        </section>
+
+        <section id="payment-section" class="page" style="display: none;">
+            <h1>支付详情</h1>
+            <div class="payment-container">
+                <div id="order-items" class="order-items-container">
+                    <!-- 订单项将在这里动态生成 -->
+                </div>
+                <div class="right-section">
+                    <div class="total-price-container">
+                        <p>总金额: <span id="total-price">0.00</span> 元</p>
+                    </div>
+                    <div class="payment-button-container">
+                        <button id="pay-order">支付订单</button>
+                        <button id="cancel-order">取消订单</button>
+                        <button id="close-payment">关闭页面</button>
+                    </div>
+                    <div class="additional-info">
+                        <p>请核对您的订单信息，并确认支付。</p>
+                        <p>如果有任何问题，请联系我们的客服。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="login-section" class="page" style="display: none;">
+            <h1>登录</h1>
+            <form id="login-form">
+                <div class="form-group" id="email-form-group">
+                    <label for="email">邮箱：</label>
+                    <input type="email" id="login-email" name="email" required>
+                </div>
+                <div class="form-group" id="username-form-group" style="display: none;">
+                    <label for="username">用户名：</label>
+                    <input type="text" id="login-username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">密码：</label>
+                    <input type="password" id="login-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; align-items: center;">
+                        <label style="margin-right: 20px;">选择角色：</label>
+                        <div style="margin-right: 50px;">
+                            <input type="radio" id="role-employee" name="role" value="employee" required>
+                            <label for="role-employee">员工</label>
+                        </div>
+                        <div style="margin-right: 50px;">
+                            <input type="radio" id="role-customer" name="role" value="customer" required>
+                            <label for="role-customer">顾客</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="role-admin" name="role" value="admin" required>
+                            <label for="role-admin">管理员</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button type="submit" id="submit-login">登录</button>
+                    <button type="button" id="register">注册</button>
+                </div>
+            </form>
+        </section>
+
+
+        <section id="signup-section" class="page" style="display: none;">
+            <h1>注册</h1>
+            <form id="signup-form">
+                <div class="form-group">
+                    <label for="signup-email">邮箱：</label>
+                    <input type="email" id="signup-email" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-password">密码：</label>
+                    <input type="password" id="signup-password" name="password" required>
+                </div>
+                <div class="form-group">
+                    <label for="signup-confirm-password">确认密码：</label>
+                    <input type="password" id="signup-confirm-password" name="confirm_password" required>
+                </div>
+                <div class="form-group" id="employee-fields" style="display: none;">
+                    <div class="form-group">
+                        <label for="signup-name">姓名：</label>
+                        <input type="text" id="signup-name" name="name" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="signup-phone">电话：</label>
+                        <input type="text" id="signup-phone" name="phone" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div style="display: flex; align-items: center;">
+                        <label style="margin-right: 20px;">选择角色：</label>
+                        <div style="margin-right: 100px;">
+                            <input type="radio" id="signup-role-employee" name="signup-role" value="employee" required>
+                            <label for="signup-role-employee">员工</label>
+                        </div>
+                        <div>
+                            <input type="radio" id="signup-role-customer" name="signup-role" value="customer" required>
+                            <label for="signup-role-customer">顾客</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button type="submit" id="submit-signup">注册</button>
+                    <button type="button" id="back-to-login">返回登录</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="change-password-section" class="page" style="display: none;">
+            <h1>修改密码</h1>
+            <form id="change-password-form">
+                <div class="form-group">
+                    <label for="old-password">原密码：</label>
+                    <input type="password" id="old-password" name="old_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="new-password">新密码：</label>
+                    <input type="password" id="new-password" name="new_password" required>
+                </div>
+                <div class="form-group">
+                    <label for="confirm-password">确认密码：</label>
+                    <input type="password" id="c-confirm-password" name="confirm_password" required>
+                </div>
+                <div class="button-container">
+                    <button type="submit" id="submit-change-password">修改密码</button>
+                    <button type="button" id="c-back-to-login">返回上一级</button>
+                </div>
+            </form>
+        </section>
+
+        <section id="my-section" class="page" style="display: none">
+            <div class="sidebar">
+                <ul>
+                    <li><a id="profile-nav" href="#" class="nav-link active" data-target="profile">个人资料</a></li>
+                    <li><a id="orders-nav" href="#" class="nav-link" data-target="orders">我的订单</a></li>
+                    <li><a id="reviews-nav" href="#" class="nav-link" data-target="reviews">我的评价</a></li>
+                </ul>
+            </div>
+            <div class="content">
+                <section id="profile" class="content-section active">
+                    <h1>个人资料</h1>
+                    <form id="profile-form">
+                        <div class="form-group">
+                            <label for="name">姓名：</label>
+                            <input type="text" id="profile-name" name="name" value="张三" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="phone">电话：</label>
+                            <input type="tel" id="profile-phone" name="phone" value="12345678901" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="email">电子邮件：</label>
+                            <input type="email" id="profile-email" name="email" value="zhangsan@example.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="address">地址：</label>
+                            <input type="text" id="profile-address" name="address" value="西电9号楼" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="password">密码：</label>
+                            <div class="input-container">
+                                <input type="password" id="password" name="password" value="" required>
+                                <button type="button" id="toggle-password">显示密码</button>
+                            </div>
+                        </div>
+                        <div class="button-container">
+                            <button type="submit" id="edit-password">修改密码</button>
+                            <button type="submit" id="submit-profile">确认修改</button>
+                            <button type="button" id="logout">取消登录</button>
+                        </div>
+                    </form>
+                </section>
+                
+    
+                <section id="orders" class="content-section">
+                    <h1>我的订单</h1>
+                    <table id="orders-table">
+                        <thead>
+                            <tr>
+                                <th>订单号</th>
+                                <th>订单日期</th>
+                                <th>订单状态</th>
+                                <th>详情</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>123456789</td>
+                                <td>2024-10-01</td>
+                                <td>已发货</td>
+                                <td><button type="button" class="order-details">查看详情</button></td>
+                            </tr>
+                            <tr>
+                                <td>987654321</td>
+                                <td>2024-10-15</td>
+                                <td>已送达</td>
+                                <td><button type="button" class="order-details">查看详情</button></td>
+                            </tr>
+                            <!-- 更多订单 -->
+                        </tbody>
+                    </table>
+                </section>
+
+
+                <section id="reviews" class="content-section">
+                    <h1>我的评价</h1>
+                    <ul id="reviews-list">
+                        <!-- 更多评价 -->
+                    </ul>
+                </section>
+
+                <section id="order-details" class="content-section">
+                    <h1>订单详情</h1>
+                    <div id="details-order-items" class="order-item">
+                        <!--订单项的信息在这里动态添加-->
+                    </div>
+                    <div id="order-items-container" class="form-group">
+                        <!-- 订单项信息将在这里动态添加 -->
+                    </div>
+                    <div id="review-form" class="form-group" style="display: none;">
+                        <label for="order-id">订单Id:</label>
+                        <input type="text" id="order-id" readonly>
+                        <label for="order-item-id">订单项Id:</label>
+                        <input type="text" id="order-item-id" readonly>
+                        <label for="rating">评分:</label>
+                        <input type="number" id="review-rating" placeholder="输入评分">
+                        <label for="comment">评论:</label>
+                        <input type="text" id="review-comment" placeholder="输入评论">
+                        <button id="submit-review">确认</button>
+                    </div>   
+                </section>
+            </div>
+        </section>
+
+
+        <section id="admin-section" class="page" style="display: none;">
+            <h1>管理员页面</h1>
+            <div class="admin-container">
+                <div class="admin-sidebar">
+                    <div class="button-container">
+                        <button id="all-employees" class="button">全部</button>
+                        <button id="available-employees" class="button">可用</button>
+                        <button id="unavailable-employees" class="button">不可用</button>
+                    </div>
+                    <div class="employee-list">
+                        <!-- 员工信息将在这里动态生成 -->
+                    </div>
+                </div>
+                <div class="admin-content">
+                    <div class="search-container">
+                        <div class="form-group">
+                            <label for="id-search">输入ID查询:</label>
+                            <input type="text" id="id-search" placeholder="请输入员工ID">
+                            <button type="button" id="search-by-id" class="button">查询</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="name-search">输入姓名查询:</label>
+                            <input type="text" id="name-search" placeholder="请输入员工姓名">
+                            <button type="button" id="search-by-name" class="button">查询</button>
+                        </div>
+                    </div>
+                    <div class="edit-container">
+                        <div class="form-group">
+                            <label for="id-edit-role">输入员工ID:</label>
+                            <input type="text" id="id-edit-role" placeholder="请输入员工ID">
+                            <label for="role-select">选择角色:</label>
+                            <select id="role-select">
+                                <option value="员工">员工</option>
+                                <option value="送餐员">送餐员</option>
+                            </select>
+                            <button type="button" id="edit-role" class="button">选择角色</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="id-edit-status">输入员工ID:</label>
+                            <input type="text" id="id-edit-status" placeholder="请输入员工ID">
+                            <label for="status-select">选择状态:</label>
+                            <select id="status-select">
+                                <option value="可用">可用</option>
+                                <option value="不可用">不可用</option>
+                            </select>
+                            <button type="button" id="edit-status" class="button">选择状态</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="id-find-customer">输入顾客ID查询:</label>
+                            <input type="text" id="id-find-customer" placeholder="请输入顾客ID">
+                            <button type="button" id="find-customer-by-id" class="button">查询</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="name-find-customer">输入顾客姓名查询:</label>
+                            <input type="text" id="name-find-customer" placeholder="请输入顾客姓名">
+                            <button type="button" id="find-customer-by-name" class="button">查询</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="id-reset-password">输入顾客ID:</label>
+                            <input type="text" id="id-reset-password" placeholder="请输入顾客ID">
+                        </div>
+                        <div class="form-group">
+                            <label for="password-reset">输入新密码:</label>
+                            <input type="password" id="password-reset" placeholder="请输入新密码">
+                            <button type="button" id="reset-password" class="button">重置密码</button>
+                        </div>
+                        <div class="form-group">
+                            <label for="logout">登出管理员:</label>
+                            <button type="button" id="admin-logout" class="button">登出</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="customer-sidebar">
+                    <button id="fetch-customers" class="button">获取所有顾客信息</button>
+                    <div class="customer-list">
+                        <!-- 顾客信息将在这里动态生成 -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="deliveryman-section" class="page" style="display: none;">
+            <h1>送货员订单列表</h1>
+            <div id="orders-list">
+                <!-- 动态生成的订单项 -->
+            </div>
+        </section>
+
+        <section id="employee-section" class="page" style="display: none;">
+            <h1>员工界面</h1>
+            <div class="admin-container">
+                <div class="admin-sidebar">
+                    <div class="button-container">
+                        <button id="show-all-dishes">显示全部</button>
+                    </div>
+                    <ul class="dish-list" id="dishes-list">
+                        <!-- 菜品列表会在这里动态生成 -->
+                    </ul>
+                </div>
+
+                <div class="middle-content" style="overflow-y: auto;">
+                    <div class="admin-content">
+                        <div class="search-container">
+                            <div class="form-group">
+                                <label for="find-id">按ID查找:</label>
+                                <input type="text" id="find-id" placeholder="输入菜品ID">
+                                <button id="find-by-id">查找</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="find-name">按名称查找:</label>
+                                <input type="text" id="find-name" placeholder="输入菜品名称">
+                                <button id="find-by-name">查找</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="find-category">按类别查找:</label>
+                                <input type="text" id="find-category" placeholder="输入类别名称">
+                                <button id="find-by-category">查找</button>
+                            </div>
+                        </div>
+                        <div class="edit-container">
+                            <strong>添加菜品</strong>
+                            <div class="form-group">
+                                <label for="add-name">名称:</label>
+                                <input type="text" id="add-name" placeholder="输入菜品名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="add-image-url">图片URL:</label>
+                                <input type="text" id="add-image-url" placeholder="输入图片URL">
+                            </div>
+                            <div class="form-group">
+                                <label for="add-price">价格:</label>
+                                <input type="number" id="add-price" placeholder="输入价格">
+                            </div>
+                            <div class="form-group">
+                                <label for="add-description">描述:</label>
+                                <input type="text" id="add-description" placeholder="输入描述">
+                            </div>
+                            <div class="form-group">
+                                <label for="add-category-id">类别ID:</label>
+                                <input type="number" id="add-category-id" placeholder="输入类别ID">
+                            </div>
+                            <button id="add-dish">确认创建菜品</button>
+                        </div>
+                        <div class="edit-container">
+                            <strong>修改菜品</strong>
+                            <div class="form-group">
+                                <label for="edit-id">ID:</label>
+                                <input type="number" id="edit-id" placeholder="输入菜品ID">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-name">名称:</label>
+                                <input type="text" id="edit-name" placeholder="输入新名称">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-url">图片URL:</label>
+                                <input type="text" id="edit-url" placeholder="输入新URL">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-price">价格:</label>
+                                <input type="text" id="edit-price" placeholder="输入新价格">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-description">描述:</label>
+                                <input type="text" id="edit-description" placeholder="输入新描述">
+                            </div>
+                            <div class="form-group">
+                                <label for="edit-category">种类ID:</label>
+                                <input type="text" id="edit-category" placeholder="输入新种类ID">
+                            </div>
+                            <button id="edit-dish">确认修改菜品</button>
+                        </div>
+                        <div class="order-container">
+                            <strong>查找订单</strong>
+                            <div class="form-group">
+                                <label for="find-by-delivery-person-id">按配送员ID查找:</label>
+                                <input type="number" id="find-by-delivery-person-id" placeholder="输入配送员ID">
+                                <button id="find-delivery-person-id">查找</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="find-by-customer-id">按客户ID查找:</label>
+                                <input type="number" id="find-by-customer-id" placeholder="输入客户ID">
+                                <button id="find-customer-id">查找</button>
+                            </div>
+                        </div>
+                        <div class="order-container">
+                            <strong>操作订单</strong>
+                            <div class="form-group">
+                                <label for="cancel-order-id">取消订单:</label>
+                                <input type="nuber" id="cancel-order-id" placeholder="输入订单ID">
+                                <button id="cancel-order-d">确认取消订单</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="confirm-order-id">确认订单:</label>
+                                <input type="number" id="confirm-order-id" placeholder="输入订单ID">
+                                <button id="confirm-order-d">确认订单</button>
+                            </div>
+                            <div class="form-group">
+                                <label for="complete-order-id">完成订单:</label>
+                                <input type="number" id="complete-order-id" placeholder="输入订单ID">
+                                <button id="complete-order-d">完成订单</button>
+                            </div>
+                        </div>
+                    </div>                  
+                </div>
+                <div class="order-sidebar">
+                    <div class="button-container">
+                        <button id="show-all-orders">显示全部订单</button>
+                    </div>
+                    <ul class="order-list" id="order-list">
+                        <!-- 订单列表会在这里动态生成 -->
+                    </ul>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="scripts.js"></script>
+</body>
+</html>

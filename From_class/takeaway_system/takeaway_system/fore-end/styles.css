@@ -1,0 +1,1542 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+}
+
+nav {
+    display: flex; /* 使用 flexbox 布局 */
+}
+
+nav ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    text-align: center;
+
+    display: flex; /* 使 ul 也成为一个 flex 容器 */
+    justify-content: flex-end; /* 使子元素（li）沿容器的右侧对齐 */
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+section {
+    padding: 20px;
+}
+
+#carousel {
+    overflow: hidden;
+    white-space: nowrap;
+    scroll-behavior: smooth;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 20px;
+}
+
+#carousel img {
+    width: 300px;
+    height: 200px;
+    margin-right: 10px;
+}
+
+#popular-dishes {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#popular-dishes .dish {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin: 10px 0;
+    width: 200px;
+    text-align: center;
+}
+
+#popular-dishes .dish img {
+    width: 100%;
+    height: auto;
+}
+
+#dish-details {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#dish-details img {
+    width: 100%;
+    height: auto;
+}
+
+
+
+#total-price {
+    margin: 10px 0;
+}
+
+#admin-nav {
+    display: none;
+}
+
+#evaluations-nav{
+    display: none;
+}
+
+#my-nav{
+    display: none;
+}
+
+#error-message {
+    color: red;
+    margin: 10px 0;
+    display: none;
+}
+
+/* 购物车项样式 */
+#cart-section {
+    max-width: 800px; /* 调整为更宽的宽度 */
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none; /* 保持原有的隐藏属性 */
+}
+
+#cart-section h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#cart-section .cart-item {
+    display: flex;
+    justify-content: space-between;
+    border-bottom: 1px solid #ccc;
+    padding: 15px 0; /* 增加内边距 */
+    margin-bottom: 15px; /* 增加外边距 */
+}
+
+#cart-section .cart-item-info {
+    flex: 2; /* 增加宽度占比 */
+}
+
+#cart-section .cart-item-info p {
+    margin: 0;
+    margin-bottom: 5px;
+}
+
+#cart-section .cart-item-price {
+    flex: 1; /* 增加宽度占比 */
+    text-align: right;
+}
+
+#cart-section .cart-item-actions {
+    display: flex;
+    align-items: center;
+}
+
+#cart-section .cart-item-actions button {
+    margin-left: 10px;
+    padding: 8px 15px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#cart-section .cart-item-actions button:hover {
+    background-color: #555;
+}
+
+#cart-section .button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#cart-section .button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#cart-section .button-container button:hover {
+    background-color: #555;
+}
+
+.forCss {
+    display: flex; /* 使用 Flexbox 布局 */
+    align-items: center; /* 垂直居中对齐 */
+}
+
+.forCss label {
+    margin-right: 10px; /* 标签和输入框之间的间距 */
+    font-weight: bold; /* 加粗标签文本 */
+    color: #333; /* 标签文本颜色 */
+}
+
+.forCss input[type="number"] {
+    padding: 10px; /* 输入框内边距 */
+    border: 1px solid #ccc; /* 输入框边框 */
+    border-radius: 4px; /* 输入框圆角 */
+    font-size: 16px; /* 输入框字体大小 */
+}
+
+.forCss input[type="number"]:focus {
+    border-color: #007bff; /* 焦点时输入框边框颜色 */
+    outline: none; /* 去除默认焦点样式 */
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5); /* 焦点时输入框阴影效果 */
+}
+
+
+cartform-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+cartform-group label {
+    margin-right: 10px;
+    font-weight: bold;
+    color: #333;
+}
+
+cartform-group input[type="text"],
+cartform-group input[type="datetime-local"] {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+cartform-group input[type="text"]:focus,
+cartform-group input[type="datetime-local"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+
+#payment-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 20px;
+    color: #555555;
+    margin: 50px auto;
+    max-width: 1200px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#payment-section h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.payment-container {
+    display: flex;
+    width: 100%;
+    height: 600px; /* 调整高度以适应滑动窗口 */
+    border: 1px solid #555555;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.order-items-container {
+    width: 50%;
+    height: 100%;
+    background-color: #f5f5f5;
+    border-right: 1px solid #555555;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.order-item {
+    background-color: #fff;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #555555;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+.right-section {
+    width: 50%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 20px;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+}
+
+.total-price-container {
+    text-align: right;
+    font-size: 20px;
+    margin-bottom: 20px;
+}
+
+.payment-button-container {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+}
+
+.payment-button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    background-color: #555555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.payment-button-container button:hover {
+    background-color: #777777;
+}
+
+.additional-info {
+    text-align: right;
+}
+
+.additional-info p {
+    margin-bottom: 10px;
+    color: #777777;
+}
+
+
+/* 评价部分容器样式 */
+.evaluations-container {
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* 标题样式 */
+.evaluations-title {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+
+/* 提交按钮样式 */
+.submit-button {
+    padding: 10px 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+/*my*/
+#my-section {
+    display: flex;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#my-section .sidebar {
+    width: 250px;
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+}
+
+#my-section .sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#my-section.sidebar ul li {
+    margin-bottom: 15px;
+}
+
+#my-section .sidebar ul li a {
+    color: #fff;
+    text-decoration: none;
+    font-weight: bold;
+    display: block;
+    padding: 10px;
+    background-color: #444;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+#my-section .sidebar ul li a:hover {
+    background-color: #555;
+}
+
+#my-section .sidebar ul li a.active {
+    background-color: #666;
+}
+
+#my-section .content {
+    flex: 1;
+    padding: 10px;
+    background-color: #fff;
+    border-top-right-radius: 8px;
+    border-bottom-right-radius: 8px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+#my-section .content-section {
+    display: none;
+    margin-bottom: 20px;
+}
+
+#my-section .content-section.active {
+    display: block;
+}
+
+/* 表单样式 */
+#my-section .form-group {
+    margin-bottom: 15px;
+}
+
+#my-section .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#my-section .form-group input,
+#my-section .form-group textarea,
+#my-section .form-group select {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#my-section .button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#my-section .button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#my-section .button-container button:hover {
+    background-color: #555;
+}
+
+/* 订单列表样式 */
+#orders table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#orders table th,
+#orders table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+#orders table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+#orders table .order-details {
+    padding: 5px 10px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#orders table .order-details:hover {
+    background-color: #555;
+}
+
+/* 评价列表样式 */
+#reviews ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#reviews ul li {
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#reviews ul li .review-item {
+    margin: 0;
+}
+
+/* 订单列表样式 */
+#orders table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#orders table th,
+#orders table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: left;
+}
+
+#orders table th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+}
+
+#orders table .order-details {
+    padding: 5px 10px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#orders table .order-details:hover {
+    background-color: #555;
+}
+
+/* 评价列表样式 */
+#reviews ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#reviews ul li {
+    margin-bottom: 15px;
+    background-color: #f9f9f9;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#reviews ul li .review-item {
+    margin: 0;
+}
+
+
+/*login-section*/
+/* 登录部分样式 */
+#login-section {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#login-section h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#login-section .form-group {
+    margin-bottom: 15px;
+}
+
+#login-section .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#login-section .form-group input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#login-section .form-group .radio-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+#login-section .form-group .radio-container div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+#login-section .form-group .radio-container div label {
+    margin-left: 5px;
+}
+
+#login-section .button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#login-section .button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#login-section .button-container button:hover {
+    background-color: #555;
+}
+
+
+/* 注册部分样式 */
+#signup-section {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#signup-section h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#signup-section .form-group {
+    margin-bottom: 15px;
+}
+
+#signup-section .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#signup-section .form-group input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#signup-section .form-group .radio-container {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+#signup-section .form-group .radio-container div {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+#signup-section .form-group .radio-container div label {
+    margin-left: 5px;
+}
+
+#signup-section .button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#signup-section .button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#signup-section .button-container button:hover {
+    background-color: #555;
+}
+
+
+/* menu-item*/
+/* 借鉴 #my 的整体样式 */
+#menu-items {
+    display: flex;
+    flex-direction: column;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #565454;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%; /* 根据需要调整宽度 */
+}
+
+/* 菜单项的样式 */
+.dish {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9; /* 浅灰色背景，类似 #my .content */
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.dish:hover {
+    background-color: #e9e9e9; /* 悬停时的背景颜色变化 */
+}
+
+/* 菜单图片的样式 */
+.dish img {
+    width: 100px; /* 根据需要调整图片大小 */
+    height: 100px;
+    margin-right: 15px;
+    border-radius: 4px;
+    object-fit: cover; /* 保持图片比例 */
+}
+
+/* 搜索框的样式 */
+#search-box {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end; /* 将搜索框放在最右边 */
+    margin-bottom: 20px;
+}
+
+#search-box input {
+    width: 200px; /* 根据需要调整宽度 */
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    transition: border-color 0.3s ease;
+}
+
+#search-box input:focus {
+    border-color: #555;
+    outline: none;
+}
+
+#search-box button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    margin-right: 150px;
+    background-color: #555;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#search-box button:hover {
+    background-color: #0056b3;
+}
+
+/* 菜单信息的样式 */
+/*.dish-info {
+    flex: 1;
+    color: #333; /* 深灰色文字，类似 #my .sidebar 
+    font-weight: bold;
+}
+
+.dish-info p {
+    margin: 0;
+    padding: 5px 0;
+    font-weight: normal;
+}
+
+.dish-info p:first-child {
+    font-weight: bold;
+}
+
+/* 按钮样式，保持与 #my .button-container 的一致 
+#menu-items .button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#menu-items .button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#menu-items .button-container button:hover {
+    background-color: #555;
+}
+*/
+
+/* 菜单项的样式 */
+.dish {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: #f9f9f9; /* 浅灰色背景，类似 #my .content */
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.dish:hover {
+    background-color: #e9e9e9; /* 悬停时的背景颜色变化 */
+}
+
+/* 菜单图片的样式 */
+.dish img {
+    width: 100px; /* 根据需要调整图片大小 */
+    height: 100px;
+    margin-right: 15px;
+    border-radius: 4px;
+    object-fit: cover; /* 保持图片比例 */
+}
+
+/* 菜单信息的样式 */
+.dish-info {
+    flex: 1;
+    color: #333; /* 深灰色文字，类似 #my .sidebar */
+    font-weight: bold;
+}
+
+.dish-info p {
+    margin: 0;
+    padding: 5px 0;
+    font-weight: normal;
+}
+
+.dish-info p:first-child {
+    font-weight: bold;
+}
+
+/* 显示菜品 ID 的样式 */
+.dish-info p.dish-id {
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* 查看详情按钮的样式 */
+.dish-actions {
+    margin-left: 15px;
+}
+
+.dish-actions button.view-details {
+    padding: 8px 15px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.dish-actions button.view-details:hover {
+    background-color: #555;
+}
+
+
+/* 菜品详情的总体样式 */
+#dishdetail-section {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* 使 section 高度占满整个视口 */
+    background-color: #f9f9f9; /* 浅灰色背景，类似其他界面 */
+}
+
+.dish-detail {
+    display: flex;
+    flex-direction: column; /* 改为竖向排列 */
+    align-items: center;
+    padding: 20px;
+    background-color: #fff; /* 白色背景，使内容更加突出 */
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    width: 100%; /* 设置宽度为100%，根据需要调整 */
+    max-width: 600px; /* 设置最大宽度 */
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* 添加阴影效果 */
+    overflow: auto; /* 使内容可滚动 */
+}
+
+.dish-detail:hover {
+    background-color: #f9f9f9; /* 悬停时的背景颜色变化 */
+}
+
+/* 菜品图片的样式 */
+.dish-detail img {
+    width: 150px; /* 根据需要调整图片大小 */
+    height: 150px;
+    margin-bottom: 20px; /* 改为下边距 */
+    border-radius: 4px;
+    object-fit: cover; /* 保持图片比例 */
+}
+
+/* 菜品信息的样式 */
+.dish-detail-info {
+    text-align: center; /* 文字居中 */
+    flex: 1;
+    color: #333; /* 深灰色文字 */
+    font-weight: bold;
+}
+
+.dish-detail-info p {
+    margin: 0;
+    padding: 5px 0;
+    font-weight: normal;
+}
+
+.dish-detail-info p:first-child {
+    font-weight: bold;
+}
+
+/* 菜品 ID 的样式 */
+.dish-detail-info p.dish-id {
+    font-size: 0.9em;
+    color: #777;
+}
+
+/* 菜品名称的样式 */
+.dish-detail-info p.dish-name {
+    font-size: 1.2em;
+}
+
+/* 菜品描述的样式 */
+.dish-detail-info p.dish-description {
+    font-size: 1em;
+    line-height: 1.5;
+    white-space: pre-wrap; /* 使多行文本能够正确显示 */
+}
+
+/* 菜品价格的样式 */
+.dish-detail-info p.dish-price {
+    font-size: 1.1em;
+    color: #333;
+}
+
+/* 评论的样式 */
+.dish-reviews {
+    margin-top: 20px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border-radius: 4px;
+    max-height: 300px; /* 设置最大高度 */
+    overflow-y: auto; /* 使内容可上下滚动 */
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dish-reviews .review {
+    margin-bottom: 10px;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+}
+
+.dish-reviews .review .review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+}
+
+.dish-reviews .review .review-id {
+    font-size: 0.8em;
+    color: #777;
+}
+
+.dish-reviews .review .review-customer {
+    font-size: 1em;
+    font-weight: bold;
+}
+
+.dish-reviews .review .review-rating {
+    font-size: 1em;
+    color: #ff9900;
+}
+
+.dish-reviews .review .review-comment {
+    font-size: 1em;
+    line-height: 1.5;
+    margin-bottom: 10px;
+}
+
+.dish-reviews .review .review-date {
+    font-size: 0.8em;
+    color: #777;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+}
+
+/* 菜品操作按钮的样式 */
+.dish-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px; /* 将按钮放在最下面 */
+}
+
+.dish-actions button {
+    padding: 8px 15px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 5px;
+}
+
+.dish-actions button:hover {
+    background-color: #555;
+}
+
+
+
+
+/*管理员*/
+#admin-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 20px;
+    color: #555555;
+    margin: 50px auto;
+    max-width: 1300px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#admin-section h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#admin-section .admin-container {
+    display: flex;
+    width: 100%;
+    height: 700px; /* 调整高度以适应滑动窗口 */
+    border: 1px solid #555555;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#admin-section .admin-sidebar{
+    width: 350px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-right: 1px solid #555555;
+    overflow-y: auto;
+}
+
+#admin-section .customer-sidebar {
+    width: 350px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-right: 1px solid #555555;
+    overflow-y: auto;
+}
+#admin-section .admin-sidebar .button-container ,
+#admin-section .customer-sidebar button{
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    margin-bottom: 20px;
+}
+
+#admin-section .admin-sidebar .button-container button,
+#admin-section .customer-sidebar button {
+    background-color: #555555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 10px; /* 按钮之间加点间距 */
+}
+
+#admin-section .admin-sidebar .button-container button:hover ,
+#admin-section .customer-sidebar button:hover {
+    background-color: #777777;
+}
+
+#admin-section .admin-sidebar .employee-list ,
+#admin-section .customer-sidebar .custom-list{
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+#admin-section .admin-sidebar .employee-list .employee-item
+#admin-section .customer-sidebar .customer-list .customer-item {
+    background-color: #444;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#admin-section .admin-sidebar .employee-list .employee-item strong,
+#admin-section .customer-sidebar .customer-list .customer-item strong {
+    font-weight: bold;
+    margin-bottom: 5px;
+    display: block;
+}
+
+#admin-section .admin-content {
+    flex: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直居中 */
+    align-items: center; /* 水平居中 */
+}
+
+#admin-section .search-container, .edit-container {
+    margin-bottom: 20px;
+    width: 100%; /* 确保容器宽度占满 */
+    max-width: 700px; /* 可选：设置最大宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 容器内的内容水平居中 */
+}
+
+#admin-section .search-container .form-group, .edit-container .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    width: 100%; /* 确保表单组宽度占满容器 */
+    justify-content: flex-start; /* 表单组内容左对齐 */
+}
+
+#admin-section .search-container .form-group label, .edit-container .form-group label {
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+#admin-section .search-container .form-group input, .search-container .form-group button,
+#admin-section .edit-container .form-group input, .edit-container .form-group button {
+    margin-right: 10px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#admin-section .search-container .form-group select, .edit-container .form-group select {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin-right: 10px;
+}
+
+#admin-section .search-container .form-group button, .edit-container .form-group button {
+    background-color: #555555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#admin-section .search-container .form-group button:hover, .edit-container .form-group button:hover {
+    background-color: #777777;
+}
+
+/*employee设置*/
+/* 员工部分样式 */
+#employee-section {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background-color: #f5f5f5;
+    padding: 20px;
+    color: #555555;
+    margin: 50px auto;
+    max-width: 1200px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+#employee-section h1 {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+#employee-section .admin-container {
+    display: flex;
+    width: 100%;
+    height: 750px; /* 调整高度以适应滑动窗口 */
+    border: 1px solid #555555;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+#employee-section .admin-sidebar {
+    width: 350px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-right: 1px solid #555555;
+    overflow-y: auto;
+}
+
+#employee-section .admin-sidebar .button-container {
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    margin-bottom: 20px;
+}
+
+#employee-section .admin-sidebar .button-container button {
+    background-color: #555555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 10px; /* 按钮之间加点间距 */
+}
+
+#employee-section .admin-sidebar .button-container button:hover {
+    background-color: #777777;
+}
+
+#employee-section .admin-sidebar .dish-list .dish-item {
+    display: flex;
+    align-items: center;
+    background-color: #444;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#employee-section .admin-sidebar .dish-list .dish-item img {
+    width: 50px;
+    height: 50px;
+    margin-right: 10px;
+    border-radius: 4px;
+}
+
+#employee-section .admin-sidebar .dish-list .dish-item .details {
+    flex: 1;
+}
+
+#employee-section .admin-content{
+    flex: 1;
+    padding: 20px;
+    background-color: #f5f5f5;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 垂直居中 */
+    align-items: center; /* 水平居中 */
+    width: 650px; /* 减小右边内容的宽度 */
+}
+
+#employee-section .search-container,
+ #employee-section .edit-container ,
+ #employee-section .order-container {
+    margin-bottom: 20px;
+    width: 100%; /* 确保容器宽度占满 */
+    max-width: 600px; /* 可选：设置最大宽度 */
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* 容器内的内容水平居中 */
+}
+
+#employee-section .search-container .form-group,
+ #employee-section .edit-container .form-group ,
+ #employee-section .order-container .form-group {
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px; /* 减小表单组的间距 */
+    width: 100%; /* 确保表单组宽度占满容器 */
+    justify-content: flex-start; /* 表单组内容左对齐 */
+}
+
+#employee-section .search-container .form-group label,
+ #employee-section .edit-container .form-group label ,
+ #employee-section .order-container .form-group label{
+    margin-right: 10px;
+    font-weight: bold;
+    width: 80px; /* 固定标签宽度，确保对齐 */
+}
+
+#employee-section .search-container .form-group input, #employee-section .search-container .form-group button,
+#employee-section .edit-container .form-group input, #employee-section .edit-container .form-group button ,
+#employee-section .order-container .form-group input, #employee-section .order-search-container .form-group button{
+    margin-right: 10px;
+    padding: 6px; /* 减小输入框和按钮的内边距 */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+
+#employee-section .search-container .form-group button,
+ #employee-section .edit-container .form-group button,
+ #employee-section .order-container .form-group button,
+ .edit-container button {
+    background-color: #555555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#employee-section .search-container .form-group button:hover, 
+#employee-section .edit-container .form-group button:hover ,
+#employee-section .order-container .form-group button:hover,
+.edit-container button:hover{
+    background-color: #777777;
+}
+
+#employee-section .order-sidebar {
+    width: 350px;
+    padding: 20px;
+    background-color: #333;
+    color: #fff;
+    border-left: 1px solid #555555;
+    overflow-y: auto;
+}
+
+#employee-section .order-sidebar .button-container {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+#employee-section .order-sidebar .button-container button {
+    background-color: #555555;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin: 0 10px;
+}
+
+#employee-section .order-sidebar .button-container button:hover {
+    background-color: #777777;
+}
+
+#employee-section .order-sidebar .order-list .order-item {
+    display: flex;
+    align-items: center;
+    background-color: #444;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+}
+
+#employee-section .order-sidebar .order-list .order-item .details {
+    flex: 1;
+}
+
+#employee-section .order-container {
+    margin-bottom: 20px;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#employee-section  .order-container .form-group{
+    display: flex;
+    align-items: center;
+    margin-bottom: 10px;
+    width: 100%;
+    justify-content: flex-start;
+}
+
+
+#deliveryman-section {
+    display: flex;
+    flex-direction: column;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #555;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    width: 80%; /* 根据需要调整宽度 */
+    color: white;
+}
+
+#deliveryman-section #orders-list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 20px;
+}
+
+/* 订单项的样式 */
+#deliveryman-section .order {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding: 10px;
+    background-color: white;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+    color: black; /* 文字颜色为黑色 */
+}
+
+#deliveryman-section .order:hover {
+    background-color: #f0f0f0;
+}
+
+/* 订单信息的样式 */
+#deliveryman-section .order-info {
+    flex: 1;
+}
+
+/* 按钮的样式 */
+#deliveryman-section .order-actions button {
+    margin-left: 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #555;
+    color: white;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+#deliveryman-section .order-actions button:hover {
+    background-color: #444;
+}
+
+
+/* 修改密码部分样式 */
+#change-password-section {
+    max-width: 400px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    display: none; /* 默认隐藏 */
+}
+
+#change-password-section h1 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+#change-password-section .form-group {
+    margin-bottom: 15px;
+}
+
+#change-password-section .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#change-password-section .form-group input {
+    width: 100%;
+    padding: 8px;
+    box-sizing: border-box;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+#change-password-section .button-container {
+    text-align: center;
+    margin-top: 20px;
+}
+
+#change-password-section .button-container button {
+    margin: 5px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #333;
+    color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+#change-password-section .button-container button:hover {
+    background-color: #555;
+}
+
+
