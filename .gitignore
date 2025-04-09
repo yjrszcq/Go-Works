@@ -1,4 +1,4 @@
-From_class/project_template/log/ 
-From_class/project_template/conf/app.env
-From_class/project_template/.git/
-From_class/project_template/.gitignore
+log/ 
+app.env
+.git/
+.gitignore
