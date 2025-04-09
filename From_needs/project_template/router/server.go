@@ -11,7 +11,7 @@ import (
 	"time"
 )
 
-func InitWebServer(config *lib.Config) *gin.Engine {
+func InitServer(config *lib.Config) *gin.Engine {
 	server := gin.Default()
 	// 解决跨域问题
 	server.Use(cors.New(cors.Config{

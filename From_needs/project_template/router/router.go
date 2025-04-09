@@ -7,7 +7,7 @@ import (
 )
 
 func SetupRoute(cfg *lib.Config) *gin.Engine {
-	router := InitWebServer(cfg)
+	router := InitServer(cfg)
 	userRoute(router.Group("/user"))
 	return router
 }
