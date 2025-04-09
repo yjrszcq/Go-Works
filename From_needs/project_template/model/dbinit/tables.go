@@ -1,8 +1,8 @@
 package dbinit
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/model"
 	"gorm.io/gorm"
+	"project/model"
 )
 
 func InitTable(db *gorm.DB) error { // 自动创建表

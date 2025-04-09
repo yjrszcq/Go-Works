@@ -1,12 +1,12 @@
 package model
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
-	"GoLandProjects/Works/From_class/haze_detection_system/model/connect"
 	"context"
 	"errors"
 	"github.com/go-sql-driver/mysql"
 	"gorm.io/gorm"
+	"project/lib"
+	"project/model/connect"
 	"time"
 )
 

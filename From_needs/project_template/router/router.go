@@ -1,9 +1,9 @@
 package router
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/controller"
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
 	"github.com/gin-gonic/gin"
+	"project/controller"
+	"project/lib"
 )
 
 func SetupRoute(cfg *lib.Config) *gin.Engine {

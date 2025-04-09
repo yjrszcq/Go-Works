@@ -1,12 +1,12 @@
 package router
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
-	"GoLandProjects/Works/From_class/haze_detection_system/middleware"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
+	"project/lib"
+	"project/middleware"
 	"strings"
 	"time"
 )

@@ -1,13 +1,13 @@
 package controller
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/domain"
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
-	"GoLandProjects/Works/From_class/haze_detection_system/service"
 	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"net/http"
+	"project/domain"
+	"project/lib"
+	"project/service"
 )
 
 func ErrorOutputForUser(ctx *gin.Context, err error) {

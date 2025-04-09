@@ -1,7 +1,7 @@
 package lib
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib/regexp"
+	"project/lib/regexp"
 )
 
 var UserRegExp *regexp.UserRegExp

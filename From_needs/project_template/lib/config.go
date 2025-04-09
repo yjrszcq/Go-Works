@@ -1,8 +1,8 @@
 package lib
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib/config"
 	"github.com/joho/godotenv"
+	"project/lib/config"
 )
 
 // 服务端配置数据结构

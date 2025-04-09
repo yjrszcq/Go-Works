@@ -1,10 +1,10 @@
 package main
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
-	"GoLandProjects/Works/From_class/haze_detection_system/model/connect"
-	"GoLandProjects/Works/From_class/haze_detection_system/model/dbinit"
-	"GoLandProjects/Works/From_class/haze_detection_system/router"
+	"project/lib"
+	"project/model/connect"
+	"project/model/dbinit"
+	"project/router"
 	"strconv"
 )
 

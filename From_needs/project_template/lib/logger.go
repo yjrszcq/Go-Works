@@ -1,10 +1,10 @@
 package lib
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib/config"
 	"log"
 	"os"
 	"path/filepath"
+	"project/lib/config"
 )
 
 var (

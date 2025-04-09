@@ -1,13 +1,13 @@
 package service
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/domain"
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
-	"GoLandProjects/Works/From_class/haze_detection_system/model"
 	"errors"
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"golang.org/x/crypto/bcrypt"
+	"project/domain"
+	"project/lib"
+	"project/model"
 )
 
 var (

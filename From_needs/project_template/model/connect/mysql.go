@@ -1,10 +1,10 @@
 package connect
 
 import (
-	"GoLandProjects/Works/From_class/haze_detection_system/lib"
 	"fmt"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"project/lib"
 )
 
 var DB *gorm.DB
